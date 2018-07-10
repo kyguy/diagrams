@@ -38,17 +38,21 @@
   \tikzstyle{b} = [circle, inner sep=0pt, thick, line width=\thickness mm, minimum size=\msize cm]
   \tikzstyle{m} = [b, draw= black, fill = white]
 
+  \node[ kafkaLocation,
+         minimum width=\kafkaSize cm, 
+         minimum height=\kafkaSize cm
+       ] (\kafkaId) {};
+  
   \begin{pgfonlayer}{foreground}
- 
-    \node[m, #3] (\kafkaId) {};
-    \node[m, above = \dis cm of \kafkaId] (\kafkaId_m0) {};
-    \node[m, above right = \dis cm of \kafkaId.15] (\kafkaId_m1) {};
-    \node[m, below right = \dis cm of \kafkaId.345] (\kafkaId_m2) {};
-    \node[m, below = \dis cm of \kafkaId] (\kafkaId_m3) {};
-    \node[b, above left = \dis cm of \kafkaId.165] (\kafkaId_m4) {};
+    \node[m, above = 0 cm of \kafkaId.center, anchor=center] (\kafkaId_M) {};
+    \node[m, above = \dis cm of \kafkaId_M] (\kafkaId_m0) {};
+    \node[m, above right = \dis cm of \kafkaId_M.15] (\kafkaId_m1) {};
+    \node[m, below right = \dis cm of \kafkaId_M.345] (\kafkaId_m2) {};
+    \node[m, below = \dis cm of \kafkaId_M] (\kafkaId_m3) {};
+    \node[b, above left = \dis cm of \kafkaId_M.165] (\kafkaId_m4) {};
 
     \foreach \x/\y in {90/0,30/1, 330/2, 270/3} {
-      \draw [line width=\cthickness mm] (\kafkaId.\x) edge (\kafkaId_m\y);
+      \draw [line width=\cthickness mm] (\kafkaId_M.\x) edge (\kafkaId_m\y);
     }
   \end{pgfonlayer}
   %\node[fit=(\kafkaId_M)(\kafkaId_m0)(\kafkaId_m1)(\kafkaId_m2)(\kafkaId_m3)(\kafkaId_m4)] (\kafkaId) {};
@@ -69,7 +73,8 @@
            inner sep = \kafkaPodSep mm,
            minimum size = \kafkaPodSize cm,
            color=black, 
-           kafkaPodColor, 
+           kafkaPodColor,
+           draw=white,
            fit=(\kafkaPodId_0)
          ] (\kafkaPodId) {};
   \end{pgfonlayer}
@@ -178,7 +183,12 @@
   \tikzstyle{arm}  = [limb, minimum height = \armLength cm]
   \tikzstyle{leg}  = [limb, rotate=90]
    
-  \node[operatorLocation] (\operatorId) {};  
+  \node[ operatorLocation,
+         circle,
+         minimum height = \operatorSize,
+         minimum width =  \operatorSize
+         ] (\operatorId) {};
+  
   \node[head, above = \operatorHeadDis cm of \operatorId.center] (head_\operatorId) {};
     
   \node[body, below = 0 cm of head_\operatorId.south] (body_\operatorId) {};
@@ -201,26 +211,28 @@
   
   \pgfmathsetmacro\coSize{\clusterOperatorSize * 0.20}
   \pgfmathsetmacro\objSize{\coSize * 0.5}
-  \pgfmathsetmacro\dis{\coSize * 0.95}
+  \pgfmathsetmacro\dis{\coSize * 1.5}
 
   \pgfmathsetmacro\clusterOperatorSep{- \clusterOperatorSize * 1.75}
   
+  \node[ circle, 
+         inner sep = \clusterOperatorSep mm,
+         minimum height = \clusterOperatorSize cm,
+         minimum width = \clusterOperatorSize cm,
+         draw=white, 
+         fill=ClusterOperatorColor,
+         clusterOperatorLocation,
+       ] (\clusterOperatorId) {};
+  
+  \tikzstyle{\clusterOperatorId Position} = [above = 0 cm of \clusterOperatorId.center, anchor=center]
+  
   \begin{pgfonlayer}{foreground}
-    \operator{\clusterOperatorId}{\coSize}{clusterOperatorLocation}{color=white}
-    \disk{\clusterOperatorId_d0}{\objSize}{left = \dis cm of \clusterOperatorId}{color=white}
-    \pod{\clusterOperatorId_p0}{\objSize}{right = \dis cm of \clusterOperatorId}{color=white}
+    \operator{\clusterOperatorId Op}{\coSize}{\clusterOperatorId Position}{color=white}
+    \disk{\clusterOperatorId_d0}{\objSize}{left = \dis cm of \clusterOperatorId Op.center}{color=white}
+    \pod{\clusterOperatorId_p0}{\objSize}{right = \dis cm of \clusterOperatorId Op.center}{color=white}
     %\cube{\coID_cube}{\coSize}{black}{above = \dis cm of \coID.north}; % location
   \end{pgfonlayer}
   
-  \begin{pgfonlayer}{main}
-    \node[ circle, 
-           inner sep = \clusterOperatorSep mm,
-           minimum size = \clusterOperatorSize cm,
-           draw, color=white, 
-           fill=ClusterOperatorColor, 
-           fit=(\clusterOperatorId)
-         ] (\clusterOperatorId) {};
-  \end{pgfonlayer}
 }
 
 \newcommand{\topicOperator}[4] {% {Id}{Size}{Location}{color}
@@ -228,48 +240,61 @@
   \tikzstyle{toColor} = [#4] % #4 = color
     
   \pgfmathsetmacro\toSize{\topicOperatorSize * 0.20}
-  \pgfmathsetmacro\dis{\toSize * 0.85}
+  \pgfmathsetmacro\dis{\topicOperatorSize * 0.25 }
   \pgfmathsetmacro\scale{\toSize / 3}
 
   \tikzstyle{partition} = [rectangle, inner sep = 0]
   \tikzstyle{grid} = [scale=\scale, thin, draw=white]
-  \operator{\topicOperatorId}{\toSize}{topicOperatorLocation}{fill=white}
+  
+   \node[ circle, 
+          inner sep = 0 mm,
+          minimum height = \topicOperatorSize cm,
+          minimum width = \topicOperatorSize cm, 
+          draw=white,
+          fill=TopicOperatorColor,
+          topicOperatorLocation
+        ] (\topicOperatorId) {};
+  
+  \tikzstyle{\topicOperatorId Position} = [above = 0 cm of \topicOperatorId.center, anchor=center]
+  
+  \operator{\topicOperatorId Op}{\toSize}{\topicOperatorId Position}{fill=white}
   
   \begin{pgfonlayer}{foreground}
-    \node (rpart) [partition, right = \dis cm of \topicOperatorId]
+    \node (rpart) [partition, right = \dis cm of \topicOperatorId Op.center]
     {
       \tikz{\draw[grid] (0,0)  grid (1,5);}
     };
-    \node (lpart) [partition, left = \dis cm of \topicOperatorId] (lpart)
+    \node (lpart) [partition, left = \dis cm of \topicOperatorId Op.center] (lpart)
     {
       \tikz{\draw[grid] (0,0)  grid (1,5);}
     };
   \end{pgfonlayer}
-   
-  \begin{pgfonlayer}{background}
-    \node[ circle, 
-           inner sep = 0 mm,
-           minimum size = \topicOperatorSize cm, 
-           draw, 
-           color=white,
-           fill=TopicOperatorColor,
-           fit=(\topicOperatorId)
-          ] (\topicOperatorId) {};
-  \end{pgfonlayer}
+  
 }
 
 \newcommand{\configMap}[3] {% {Id}{Size}{Location}
   \initVars{configMap}{#1}{#2}{#3}
   
-  \pgfmathsetmacro\scale{\configMapSize}
+  \pgfmathsetmacro\scale{\configMapSize * 1.3}
   \definecolor{blueprint}{RGB}{4,63,140}
 
+   \node[ configMapLocation,
+          minimum width=\configMapSize cm, 
+          minimum height=\configMapSize cm,
+          rectangle,
+          fill=blueprint,
+          rounded corners,
+          inner sep = 0 mm,
+          draw=white
+        ] (\configMapId) {};
+        
   %\draw (0,0) node (wrench) [yscale=\scale,xscale=\scale, thick, cmLocation ] {\bcoutil};
-  \draw (0,0) node (wrench) [yscale=\scale, xscale=\scale, configMapLocation, color=white] {\faWrench};
-
-  \begin{pgfonlayer}{background}
-    \node[rectangle,inner sep = 0pt, fill=blueprint, draw=white, fit=(wrench)] (\configMapId) {};
-  \end{pgfonlayer}
+  \draw (0,0) node (wrench) [ yscale=\scale, 
+                              xscale=\scale,
+                              above = 0 cm of \configMapId.center,
+                              anchor = center, 
+                              color=white
+                            ] {\faWrench};
 }
 
 % Establishes consistent variable scheme by prepending all
@@ -307,14 +332,14 @@
   \pgfmathsetmacro\scale{\zookeeperSize}
   \pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
 
-  \node[ minimum width= \zookeeperSize cm, 
-         circle, 
-         fill=ZookeeperColor, 
-         outer sep=0mm, 
-         minimum size=\zookeeperSize cm,
+  \node[ zookeeperLocation, 
+         minimum width=\zookeeperSize cm, 
+         minimum height=\zookeeperSize cm,
+         fill=ZookeeperColor,
+         circle,
+         draw=white,
+         text=white,
          font=\fontsize{\zookeeperFontSize}{0}\selectfont,
-         text=white, 
-         zookeeperLocation
        ] (\zookeeperId) {Z};
 }
   
@@ -324,33 +349,31 @@
  
   \node[legendLocation] (LOC) {Legend};
   
-  \clusterOperator{coL}{\legendSize}{below = 0.4 * \legendDis cm of LOC}{}
+  \clusterOperator{coL}{\legendSize}{below = 0.2 * \legendDis cm of LOC}{}
   \node[right = 0.25 cm of coL] (coL_label) {Cluster Operator};
   
-  \topicOperator{toL}{\legendSize}{below = 1.2 * \legendDis cm of LOC}{}
+  \topicOperator{toL}{\legendSize}{below = 1.0 * \legendDis cm of LOC}{}
   \node[right = 0.25 cm of toL] (to_label) {Topic Operator};
   
-  \kafkaPod{kpL}{\legendSize}{below = 2.0 * \legendDis cm of LOC}{fill=yellow}
+  \kafkaPod{kpL}{\legendSize}{below = 1.8 * \legendDis cm of LOC}{fill=yellow}
   \node[right = 0.25 cm of kpL] (kpL_label) {Kafka Broker Pod};
   
-  \zookeeper{zL}{\legendSize}{below = 2.5 * \legendDis cm of LOC}
+  \zookeeper{zL}{\legendSize}{below = 2.6 * \legendDis cm of LOC}
   \node[right = 0.25 cm of zL] (zL_label) {Zookeeper Pod};
  
-  \configMap{cmL}{\legendSize}{below = 3.25 * \legendDis cm of LOC}
+  \configMap{cmL}{\legendSize}{below = 3.4 * \legendDis cm of LOC}
   \node[right = 0.25 cm of cmL] (cmL_label) {ConfigMap};
   
   \node[draw, dotted, thick, fit=(coL)(toL)(kpL)(zL)(kpL_label)(cmL)] () {};
 }
-
   
 \begin{tikzpicture}
 
   \clusterOperator{co0}{2}{}{}
-  \topicOperator{to0}{2}{right = 2 cm of co0.center}{}
-  \kafkaPod{kp0}{2}{right = 2  cm of to0.center}{fill=yellow}
-  \topicOperator{to0}{2}{right = 2 cm of co0.center}{}
-  \zookeeper{zk0}{2}{right = 1.25  cm of kp0.center}{}
-  \configMap{cm0}{2}{right = 1.25  cm of zk0.center}{}
+  \topicOperator{to0}{2}{right = 1.25 cm of co0.center}{}
+  \kafkaPod{kp0}{2}{right = 1.25 cm of to0.center}{fill=yellow}
+  \zookeeper{zk0}{2}{right = 1.25 cm of kp0.center}{}
+  \configMap{zcm0}{2}{right = 1.25  cm of zk0.center}{}
   %\node[draw=black, dotted, fit=(co0)(to0)(kp0)(zk0)] () {};
   %\testt{f}
   %  \hardware{hw0}{1.0}{}
@@ -365,23 +388,23 @@
   \hardware{hw0}{1.0}{}
   \pgfmathsetmacro\diagramSize{.8}
   
-  \clusterOperator{co0}{\diagramSize}{right = 0.35cm of hw0_openshift.center}{}
-  \configMap{cm0}{0.9}{left = 0.85cm of co0.center}
+  \clusterOperator{co0}{\diagramSize}{right = 0.15cm of hw0_openshift.mid}{}
+  \configMap{cm0}{\diagramSize}{left = 0.15cm of hw0_openshift.mid}
   
   \hardware{hw1}{1.0}{right = 1cm of hw0}
-  \topicOperator{to0}{\diagramSize}{right = 0.35cm of hw1_openshift.center}{}
-  \configMap{cm1}{0.9}{left = 0.85cm of to0.center}
+  \topicOperator{to0}{\diagramSize}{right = 0.15cm of hw1_openshift.mid}{}
+  \configMap{cm1}{\diagramSize}{left = 0.15cm of hw1_openshift.mid}
   
   \hardware{hw2}{1.0}{above right = 4.5cm and 1cm of hw1}
-  \kafkaPod{kp0}{\diagramSize}{right = 0.45cm of hw2_openshift.mid}{fill=yellow}
+  \kafkaPod{kp0}{\diagramSize}{right = 0.15cm of hw2_openshift.mid}{fill=yellow}
   \zookeeper{z0}{\diagramSize}{left = 0.15cm of hw2_openshift.mid}
   
   \hardware{hw3}{1.0}{below = 2cm of hw2}
-  \kafkaPod{kp1}{\diagramSize}{right = 0.45cm of hw3_openshift.mid}{fill=yellow}
+  \kafkaPod{kp1}{\diagramSize}{right = 0.15cm of hw3_openshift.mid}{fill=yellow}
   \zookeeper{z1}{\diagramSize}{left = 0.15cm of hw3_openshift.mid}
   
   \hardware{hw4}{1.0}{below = 2cm of hw3}
-  \kafkaPod{kp2}{\diagramSize}{right = 0.45cm of hw4_openshift.mid}{fill=yellow}
+  \kafkaPod{kp2}{\diagramSize}{right = 0.15cm of hw4_openshift.mid}{fill=yellow}
   \zookeeper{z2}{\diagramSize}{left = 0.15cm of hw4_openshift.mid}
   
   \node[draw, dotted, thick, inner sep = 1 mm, fit=(z0)(z1)(z2)] (ss0) {};
@@ -391,11 +414,11 @@
   \node[below = 1.50cm of ss0] (place1) {};
   \node[below = 1.75cm of ss1] (place2) {};
   
-  \draw [->]  (co0.165) -- (cm0.22);
-  \draw [->]  (cm0.345) -- (co0.195);
+  %\draw [->]  (co0.165) -- (cm0.22);
+  %\draw [->]  (cm0.345) -- (co0.195);
 
-  \draw [->]  (to0.165) -- (cm1.22);
-  \draw [->]  (cm1.345) -- (to0.195);
+  %\draw [->]  (to0.165) -- (cm1.22);
+  %\draw [->]  (cm1.345) -- (to0.195);
   
   %\node[circle, dotted, minimum width = 7cm, draw=black, fit=(hw0)(hw1)] (T) {};
   
@@ -429,10 +452,8 @@
 \end{tikzpicture}
  %\fi
 
- % ConfigMap sizing
- % Fix zookeeper sizing
+ % fix arrows
  % Diagram orientation
- % Nodes as part of circle
+ % curved fit
 
-  
 \end{document}
