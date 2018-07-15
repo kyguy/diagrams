@@ -1,8 +1,12 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[ tikz,
+                border=5mm,
+                %convert={outfile=strimzi_arch.svg}
+               ]{standalone}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{tikz}
+\usetikzlibrary{intersections}
 \usetikzlibrary{positioning}
 \usetikzlibrary{fit}
 \usetikzlibrary{shapes}
@@ -23,7 +27,6 @@
 \definecolor{TopicOperatorColor}{RGB}{0,51,71}
 \definecolor{ZookeeperColor}{RGB}{11,102,35}
 \definecolor{HardwareColor}{RGB}{0,0,51}
-
 
 \begin{document}
 
@@ -60,7 +63,7 @@
 
 \newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{color}
   \initVars{kafkaPod}{#1}{#2}{#3}
-  \tikzstyle{kafkaPodColor} = [#4]     % #4 = color
+  \tikzstyle{kafkaPodColor} = [fill=yellow]     % #4 = color
     
   \pgfmathsetmacro\kafkaPodSize{\kafkaPodSize} 
    % Can't pass \kafkaPodLocation 
@@ -312,15 +315,18 @@
   \pgfmathsetmacro\width{\hardwareSize*2.0}
   \pgfmathsetmacro\height{\hardwareSize*0.5}
   \pgfmathsetmacro\osHeight{\height*3}
+  \pgfmathsetmacro\nodeDis{\hardwareSize*0.25}
   
   \tikzstyle{base} = [rectangle, rounded corners, minimum height = \height cm, minimum width = \width cm] 
   
-  \node[base, fill=black!80, text=white, hardwareLocation] (\hardwareId) {\tiny Node};
+  \node[hardwareLocation] (\hardwareId) {};
+  \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {\tiny Node};
+  
   \begin{pgfonlayer}{background}
     \node [ base, 
             fill=gray!80, 
             text=white, 
-            above = 0cm of \hardwareId.north, 
+            above = 0cm of \hardwareId_Node.north, 
             minimum height = \osHeight cm
           ] (\hardwareId_openshift) {};
   \end{pgfonlayer}
@@ -349,70 +355,145 @@
  
   \node[legendLocation] (LOC) {Legend};
   
-  \clusterOperator{coL}{\legendSize}{below = 0.2 * \legendDis cm of LOC}{}
-  \node[right = 0.25 cm of coL] (coL_label) {Cluster Operator};
-  
-  \topicOperator{toL}{\legendSize}{below = 1.0 * \legendDis cm of LOC}{}
-  \node[right = 0.25 cm of toL] (to_label) {Topic Operator};
-  
-  \kafkaPod{kpL}{\legendSize}{below = 1.8 * \legendDis cm of LOC}{fill=yellow}
-  \node[right = 0.25 cm of kpL] (kpL_label) {Kafka Broker Pod};
-  
-  \zookeeper{zL}{\legendSize}{below = 2.6 * \legendDis cm of LOC}
-  \node[right = 0.25 cm of zL] (zL_label) {Zookeeper Pod};
- 
-  \configMap{cmL}{\legendSize}{below = 3.4 * \legendDis cm of LOC}
-  \node[right = 0.25 cm of cmL] (cmL_label) {ConfigMap};
+  \def\legendList{ \clusterOperator/coL/Cluster Operator, 
+                   \topicOperator/toL/Topic Operator, 
+                   \kafkaPod/kpL/Kafka Broker Pod, 
+                   \zookeeper/zL/Zookeeper Pod, 
+                   \configMap/cmL/ConfigMap
+                 }
+  \pgfmathsetmacro\iter{0.2}
+    
+  \foreach \key/\id/\labe in \legendList {
+    \key{\id}{\diagramSize}{below = \iter * \legendDis cm of LOC}{}
+    \node[right = 0.25 cm of \id ] (\id_label) {\labe};
+    
+    \pgfmathparse{\iter + 0.8}
+    \global\let\iter=\pgfmathresult
+  }
   
   \node[draw, dotted, thick, fit=(coL)(toL)(kpL)(zL)(kpL_label)(cmL)] () {};
 }
   
-\begin{tikzpicture}
-
-  \clusterOperator{co0}{2}{}{}
-  \topicOperator{to0}{2}{right = 1.25 cm of co0.center}{}
-  \kafkaPod{kp0}{2}{right = 1.25 cm of to0.center}{fill=yellow}
-  \zookeeper{zk0}{2}{right = 1.25 cm of kp0.center}{}
-  \configMap{zcm0}{2}{right = 1.25  cm of zk0.center}{}
+%\begin{tikzpicture}
+  %\clusterOperator{co0}{2}{}{}
+  %\topicOperator{to0}{2}{right = 1.25 cm of co0.center}{}
+  %\kafkaPod{kp0}{2}{right = 1.25 cm of to0.center}{fill=yellow}
+  %\zookeeper{zk0}{2}{right = 1.25 cm of kp0.center}{}
+  %\configMap{zcm0}{2}{right = 1.25  cm of zk0.center}{}
   %\node[draw=black, dotted, fit=(co0)(to0)(kp0)(zk0)] () {};
   %\testt{f}
   %  \hardware{hw0}{1.0}{}
   %\cube{ww}{10}{}{blue}
   %\kafkaPod{www}{1}{}{}
   %\kafka{KKK}{1}{}
-\end{tikzpicture}
+%\end{tikzpicture}
 
 %\iffalse
-\begin{tikzpicture}
 
-  \hardware{hw0}{1.0}{}
+%\def\centerarc[#1](#2)(#3:#4:#5)% Syntax: [draw options] (center) (initial angle:final %angle:radius)
+%    { \draw[#1] ($(#2)+({#5*cos(#3)},{#5*sin(#3)})$) arc (#3:#4:#5); }
+
+
+\begin{tikzpicture}
   \pgfmathsetmacro\diagramSize{.8}
   
-  \clusterOperator{co0}{\diagramSize}{right = 0.15cm of hw0_openshift.mid}{}
-  \configMap{cm0}{\diagramSize}{left = 0.15cm of hw0_openshift.mid}
+  \pgfmathsetmacro\midCircle{10}
+  \pgfmathsetmacro\innerCircle{\midCircle * 0.65}
+  \pgfmathsetmacro\outerCircle{\midCircle * 1.35}
+  \pgfmathsetmacro\ssInner{\innerCircle / 2}
+  \pgfmathsetmacro\ssOuter{\outerCircle / 2}
+  \def\ssColor{magenta!50}
+  \def\ssLineWidth{2.5mm}
+  \tikzstyle{ssStyle} = [thick, green, -]
   
-  \hardware{hw1}{1.0}{right = 1cm of hw0}
-  \topicOperator{to0}{\diagramSize}{right = 0.15cm of hw1_openshift.mid}{}
-  \configMap{cm1}{\diagramSize}{left = 0.15cm of hw1_openshift.mid}
+  \node[circle, minimum size=\midCircle cm, draw, dotted] (CENTER) {};
+  \node[circle, minimum size= \innerCircle cm, draw, dotted]  (INNERCIRCLE) {};
+  \node[circle, minimum size= \outerCircle cm, draw, dotted]  (OUTERCIRCLE) {};
+  %\node[circle, minimum size= 25 cm, draw, dotted]  (OTERCIRCLE) {};
   
-  \hardware{hw2}{1.0}{above right = 4.5cm and 1cm of hw1}
-  \kafkaPod{kp0}{\diagramSize}{right = 0.15cm of hw2_openshift.mid}{fill=yellow}
-  \zookeeper{z0}{\diagramSize}{left = 0.15cm of hw2_openshift.mid}
+  \hardware{hw000}{1.0}{left=1.2cm of CENTER.center, anchor=center}
+
+  \clusterOperator{co0}{\diagramSize}{right = 0.15cm of hw000_openshift.mid}{}
+  \configMap{cm0}{\diagramSize}{left = 0.15cm of hw000_openshift.mid}
   
-  \hardware{hw3}{1.0}{below = 2cm of hw2}
-  \kafkaPod{kp1}{\diagramSize}{right = 0.15cm of hw3_openshift.mid}{fill=yellow}
-  \zookeeper{z1}{\diagramSize}{left = 0.15cm of hw3_openshift.mid}
+  \hardware{hw111}{1.0}{right=1.2cm of CENTER.center, anchor=center}
+  \topicOperator{to0}{\diagramSize}{right = 0.15cm of hw111_openshift.mid}{}
+  \configMap{cm1}{\diagramSize}{left = 0.15cm of hw111_openshift.mid}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+
+  \newcommand{\mylist}{hw2/kp0/z0/90, hw3/kp1/z1/180, hw4/kp2/z2/270} 
   
-  \hardware{hw4}{1.0}{below = 2cm of hw3}
-  \kafkaPod{kp2}{\diagramSize}{right = 0.15cm of hw4_openshift.mid}{fill=yellow}
-  \zookeeper{z2}{\diagramSize}{left = 0.15cm of hw4_openshift.mid}
+  \pgfmathsetmacro\iter{0}
+  \pgfmathsetmacro\angle{90}
+            
+  \pgfmathsetmacro\numOfNodes{5}
+  \pgfmathsetmacro\numOfNodeCon{\numOfNodes - 1}
+  \pgfmathsetmacro\angleIncrement{180 / (\numOfNodes - 1)}
   
-  \node[draw, dotted, thick, inner sep = 1 mm, fit=(z0)(z1)(z2)] (ss0) {};
-  \node[draw, dotted, thick, inner sep = 1 mm, fit=(kp0)(kp1)(kp2)] (ss1) {};
+  \foreach \nodeNum in {1,...,\numOfNodes}{
+    \def\hId{hw\nodeNum}
+    \def\kId{kp\nodeNum}
+    \def\zId{z\nodeNum}
+    
+    \hardware{\hId}{1.0}{above=0cm of CENTER.\angle, anchor=center}
+    \kafkaPod{\kId}{\diagramSize}{right = 0.15cm of \hId_openshift.mid}{fill=yellow}
+    \zookeeper{\zId}{\diagramSize}{left = 0.15cm of \hId_openshift.mid}
+    
+    \pgfmathparse{\angle + 180}
+    \global\let\iter=\pgfmathresult
+    
+    \node (\kId con) at ([shift=({\iter:1.0 cm})]\kId) {};
+    \node (\zId con) at ([shift=({\iter:1.0 cm})]\zId) {};
+    
+    \coordinate(ic) at (intersection 1 of INNERCIRCLE and \kId con--\kId);
+    \coordinate(oc) at (intersection 1 of OUTERCIRCLE and \zId con--\zId);
+        
+    \node(\kId ss) at (ic) {};
+    \node[inner sep = 0 mm] (\zId ss) at (oc) {\color{red}$\bullet$ };
+    
+    \path[draw, -, line width = \ssLineWidth, color=\ssColor] (\kId) -- (\kId ss.\iter);
+    \path[draw, -, line width = \ssLineWidth, color=\ssColor] (\zId) -- (\zId ss.\angle);
+         
+    \pgfmathparse{\angle + \angleIncrement}
+    \global\let\angle=\pgfmathresult
+  }
   
-  \node[below = 1.25cm of to0] (place0) {};
-  \node[below = 1.50cm of ss0] (place1) {};
-  \node[below = 1.75cm of ss1] (place2) {};
+  \begin{scope}
+    \pgfsetcolor{\ssColor}
+    \pgfsetlinewidth{\ssLineWidth}
+    
+    \foreach \nodeNum [evaluate=\nodeNum as \xx using int(\nodeNum)] \  in {1,...,\numOfNodeCon}{
+    
+      \def\kIdSS{kp\nodeNum ss}
+      \def\zIdSS{z\nodeNum ss}
+      
+      \pgfmathsetmacro\nodeNumF{int(\xx + 1)}
+      \def\kIdSSf{kp\nodeNumF ss}
+      \def\zIdSSf{z\nodeNumF ss}
+      
+      %\node[] () {\Large \kIdSSf};
+      
+      \pgfpathmoveto{\pgfpointanchor{\kIdSS}{center}}
+      \pgfpatharcto{\ssInner cm}{\ssInner cm}{0}{0}{1}{\pgfpointanchor{\kIdSSf}{center}}
+      \pgfusepath{draw}
+      
+      \pgfpathmoveto{\pgfpointanchor{\zIdSS}{center}}
+      \pgfpatharcto{\ssOuter cm}{\ssOuter cm}{0}{0}{1}{\pgfpointanchor{\zIdSSf}{center}}
+      \pgfusepath{draw}
+
+    }
+   
+  \end{scope}
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %\node[draw, dotted, thick, inner sep = 1 mm, fit=(z0)(z1)(z2)] (ss0) {};
+  %\node[draw, dotted, thick, inner sep = 1 mm, fit=(kp0)(kp1)(kp2)] (ss1) {};
+  
+  %\node[below = 1.25cm of to0] (place0) {};
+  %\node[below = 1.50cm of ss0] (place1) {};
+  %\node[below = 1.75cm of ss1] (place2) {};
+  
   
   %\draw [->]  (co0.165) -- (cm0.22);
   %\draw [->]  (cm0.345) -- (co0.195);
@@ -442,12 +523,12 @@
   % (to0.north) edge (kp0.south)
   % (to0.120) edge (z0.190);
   
-  \legend{L0}{1}{above right = 2cm and 1.0cm of hw2}
+  \legend{L0}{1}{below right= 0.75cm and 3.0cm of CENTER.0, anchor=center}
   
-  \node[ above right = 3.5cm and -1.5cm of hw0,  
-         align=center, 
-         font=\bfseries
-       ] (Title) {\Huge Strimzi\\Kafka Operator\\Architecture};
+  %\node[ above right = 3.5cm and -1.5cm of hw0,  
+  %       align=center, 
+  %       font=\bfseries
+  %     ] (Title) {\Huge Strimzi\\Kafka Operator\\Architecture};
 
 \end{tikzpicture}
  %\fi
