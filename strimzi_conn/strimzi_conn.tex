@@ -17,6 +17,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{tikz}
+\usepackage{ifthen}
 \usetikzlibrary{intersections}
 \usetikzlibrary{positioning}
 \usetikzlibrary{fit}
@@ -25,6 +26,7 @@
 \usetikzlibrary{matrix}
 \usepackage{fontawesome} 
 \usetikzlibrary{backgrounds}
+
 
 \pgfdeclarelayer{background}
 \pgfdeclarelayer{foreground}
@@ -35,29 +37,8 @@
 \definecolor{ZookeeperColor}{RGB}{11,102,35}
 \definecolor{HardwareColor}{RGB}{0,0,51}
 
-\tikzstyle{SECURE_CONN} = [color=gray!80, thick, dashed, draw]
-\tikzstyle{INSECURE_CONN} = [color=red, thick, dashdotted, draw] 
-
-% TODO
-% \getwidthofnode will measure the width of the node given as its second
-% parameter and store it into the first parameter.
-% Credit: https://tex.stackexchange.com/questions/8691/widthof-within-tikzpicture
-%\makeatletter
-%\newcommand\getwidthofnode[2]{%
-%    \pgfextractx{#1}{\pgfpointanchor{#2}{east}}%
-%    \pgfextractx{\pgf@xa}{\pgfpointanchor{#2}{west}}% \pgf@xa is a length defined by PGF for %temporary storage. No need to create a new temporary length.
-%    \addtolength{#1}{-\pgf@xa}%
-%}
-%\makeatother
-
-%\newcounter{arraycard}
-%\def\arrayLength#1{%
-%  \setcounter{arraycard}{0}%
-%  \foreach \x in #1{%
-%    \stepcounter{arraycard}%
-%  }%
-%  \the\value{arraycard}%
-%}  
+\tikzstyle{SECURE_CONN} =  [color=gray!60, thick, dashed, draw]
+\tikzstyle{INSECURE_CONN} = [color=red!60, thick, dashdotted, draw] 
 
 %\iffalse
 %\fi
@@ -103,7 +84,7 @@
   %\node[fit=(\kafkaId_M)(\kafkaId_m0)(\kafkaId_m1)(\kafkaId_m2)(\kafkaId_m3)(\kafkaId_m4)] (\kafkaId) {};
 }
 
-\newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{color}
+\newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{label}
   \initVars{kafkaPod}{#1}{#2}{#3}
   \tikzstyle{kafkaPodColor} = [fill=yellow]     % #4 = color
     
@@ -120,7 +101,8 @@
            color=black, 
            kafkaPodColor,
            draw=white,
-           fit=(\kafkaPodId_0)
+           fit=(\kafkaPodId_0),
+           label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
          ] (\kafkaPodId) {};
   \end{pgfonlayer}
 }
@@ -195,9 +177,9 @@
   %     ] (\operatorId_center) {};
 }
 
-\newcommand{\topicOperator}[4] {% {Id}{Size}{Location}{color}
+\newcommand{\topicOperator}[4] {% {Id}{Size}{Location}{label}
   \initVars{topicOperator}{#1}{#2}{#3}
-  \tikzstyle{toColor} = [#4] % #4 = color
+  %\tikzstyle{toColor} = [#4] % #4 = color
     
   \pgfmathsetmacro\toSize{\topicOperatorSize * 0.20}
   \pgfmathsetmacro\dis{\topicOperatorSize * 0.25 }
@@ -212,7 +194,8 @@
           minimum width = \topicOperatorSize cm, 
           draw=white,
           fill=TopicOperatorColor,
-          topicOperatorLocation
+          topicOperatorLocation,
+          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
         ] (\topicOperatorId) {};
   
   \tikzstyle{\topicOperatorId Position} = [above = 0 cm of \topicOperatorId.center, anchor=center]
@@ -256,7 +239,7 @@
   \node[above = 0cm of \hardwareId_openshift.south, text=white] () {\tiny OpenShift};
 }
 
-\newcommand{\zookeeper}[4] { %{Id}{Size}{Location}
+\newcommand{\zookeeper}[4] { %{Id}{Size}{Location}{label}
   \initVars{zookeeper}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\zookeeperSize}
   \pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
@@ -269,62 +252,77 @@
          draw=white,
          text=white,
          font=\fontsize{\zookeeperFontSize}{0}\selectfont,
+         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\zookeeperId) {Z};
 }
 
-\newcommand{\conn}[4] { %{Id}{Size}{Location}{Conn Type}
+\newcommand{\conn}[5] { %{Id}{Size}{Location}{Conn Type}{label}
    \initVars{conn}{#1}{#2}{#3}
+   
    \node[ rectangle, 
           minimum height=\connSize cm, 
           minimum width=\connSize cm, 
-          tlsLocation
+          tlsLocation,
+          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #5}}
         ] (\connId) {};
-   \path[-, #4, line width= \connSize mm] (\connId.west) edge (\connId.east);
+   \path[-, #4] (\connId.west) edge (\connId.east);
 }
 
-\newcommand{\tls}[4] { %{Id}{Size}{Location}{Conn Type}
+\newcommand{\tls}[4] { %{Id}{Size}{Location}{label}
    \initVars{tls}{#1}{#2}{#3}
-   \conn{#1}{#2}{#3}{SECURE_CONN}
+   \conn{#1}{#2}{#3}{S_CONN}{#4}
 }
 
-\newcommand{\tyy}[4] { %{Id}{Size}{Location}{Conn Type}
+\newcommand{\nonTls}[4] { %{Id}{Size}{Location}{label}
    \initVars{tls}{#1}{#2}{#3}
-   \conn{#1}{#2}{#3}{INSECURE_CONN}
+   \conn{#1}{#2}{#3}{IS_CONN}{#4}
 }
-%\newcommand{\non}[4] { %{Id}{Size}{Location}{Conn Type}
-%   \initVars{non}{#1}{#2}{#3}
-%   \conn{#1}{#2}{#3}{SECURE_CONN}
-%}
 
-\newcommand{\legend}[4] { %{Id}{Size}{Location}{Orientation}
+\newcommand{\legend}[4] { %{Id}{Size}{Location}{Length}
   \initVars{legend}{#1}{#2}{#3}
   \pgfmathsetmacro\legendDis{\legendSize * 3.0}
-  \pgfmathsetmacro\fontSize{\legendSize * 6}
-  \pgfmathsetmacro\fontSep{\legendSize * 4}
+  \pgfmathsetmacro\fontSize{\legendSize * 5}
+  \pgfmathsetmacro\fontSep{\legendSize * 3}
+  \pgfmathsetmacro\horzScale{\legendSize * 1.5}
+  \pgfmathsetmacro\vertScale{\legendSize * 1.3}
+  \pgfmathsetmacro\horzSep{#2 * 3.5}
+                   
+  \pgfmathsetmacro\horzDis{0}
+  \pgfmathsetmacro\vertDis{0}
  
-  \node[legendLocation] (LOC) {};
+  \node[rectangle, minimum width = #4 cm, legendLocation] (LOC) {};
   
   \def\legendList{ \topicOperator/toL/Topic Operator, 
                    \kafkaPod/kpL/Kafka Broker Pod, 
                    \zookeeper/zL/Zookeeper Pod,
-                   \tls/tL/TLS,
-                   \tyy/tL/Non TLS
-                   %\nonTls/ntL/Non TLS
+                   \tls/tL/TLS connection,
+                   \nonTls/tLL/Insecure connection
                  }
-  \pgfmathsetmacro\iter{0.2}
-    
-  \foreach \key/\id/\labe in \legendList {
-    \key{\id}{\legendSize}{#4 = \iter * \legendDis cm of LOC}{}
-    \node[ below = 0.25 cm of \id,
-           font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-         ] (\id_label) {\labe};
-     
-    \pgfmathparse{\iter + 0.8}
-    \global\let\iter=\pgfmathresult
+
+  \foreach\key/\id/\labe [count=\xi] in \legendList {
+        
+    \key{\id}
+        {\legendSize}
+        {above = 0cm of LOC.west, anchor=center, xshift = \horzDis cm, yshift = \vertDis cm}
+        {\labe}
+            
+    \pgfmathtruncatemacro\horDis{\horzDis + \horzScale} 
+    \ifthenelse { \horDis  < #4} 
+    {
+      \pgfmathparse{\horzDis + \horzSep}
+      \global\let\horzDis=\pgfmathresult   
+    }
+    {
+      \pgfmathparse{\horzDis - \horzDis}
+      \global\let\horzDis=\pgfmathresult  
+       
+      \pgfmathparse{\vertDis - \vertScale}
+      \global\let\vertDis=\pgfmathresult
+    }
   }
-  % Space nodes to prevent overlap
+   
   % Make List Here (Aggregate nodes for Legend )
-  \node[dotted, thick, fit=(toL)(toL_label)(kpL)(zL)(zL_label)(kpL_label)] () {};
+  \node[dotted, thick, fit=(toL)(kpL)(zL)] () {};
 }
 
 \newcommand{\cluster}[6] { %{Id}{Size}{Location}{Num}{Type}{Extra}
@@ -348,7 +346,7 @@
 
 \newcommand{\rings}[2] { %{Text}{numOfRings}
   \pgfmathsetmacro\connSize{\clusterSize}
-  \pgfmathsetmacro\fontSize{\clusterSize * 7}
+  \pgfmathsetmacro\fontSize{\clusterSize * 5}
   \pgfmathsetmacro\fontSep{\clusterSize * 6}
   \pgfmathsetmacro\circSize{\clusterSize*2}
   \pgfmathsetmacro\incrSize{\clusterSize*0.4}
@@ -371,25 +369,22 @@
 \begin{tikzpicture}
   \pgfmathsetmacro\diagramSize{3.0}
   \pgfmathsetmacro\midCircle{\diagramSize*2}
-  \pgfmathsetmacro\structHeight{\diagramSize}
-  \pgfmathsetmacro\podSize{\diagramSize*0.35}
-  
-  \pgfmathsetmacro\lSize{\diagramSize*0.25}
+  \pgfmathsetmacro\structHeight{\diagramSize*0.85}
+  \pgfmathsetmacro\podSize{\diagramSize*0.25}
   
   \pgfmathsetmacro\connThickness{\podSize}
-  \pgfmathsetmacro\connThicknesss{\podSize/3}
-  \tikzstyle{S_CONN} = [SECURE_CONN, line width=\connThickness mm]
-  \tikzstyle{IS_CONN} = [INSECURE_CONN, line width=\connThicknesss mm]
+  \pgfmathsetmacro\inConnThickness{\connThickness/3}
   
-  \pgfmathsetmacro\midCircle{7.5}
-
+  \tikzstyle{S_CONN}  = [SECURE_CONN, line width=\connThickness mm]
+  \tikzstyle{IS_CONN} = [INSECURE_CONN, line width=\inConnThickness mm]
+  
   %\node[circle, minimum size= \midCircle cm, dotted]  (CENTER) {};
-  \node[rectangle, minimum width= \midCircle cm, minimum height= \structHeight cm,  dotted]  (CENTER) {};
+  \node[rectangle, minimum width= \midCircle cm, minimum height= \structHeight cm]  (CENTER) {};
   
-  % Kafka Cluster
-  \cluster{kc0}{\podSize}{above = 0cm of CENTER.210, anchor=center}{3}{\kafkaPod}{\rings{Interbroker\\9091}{1} }
-  % Zoo Cluster
-  \cluster{zc0}{\podSize}{above = 0cm of CENTER.330, anchor=center}{3}{\zookeeper}{\rings{Internodal\\2888:3888}{2} }
+  % Kafka Cluster 210
+  \cluster{kc0}{\podSize}{above = 0cm of CENTER.south west, anchor=center}{3}{\kafkaPod}{\rings{Interbroker\\9091}{1} }
+  % Zoo Cluster   340?
+  \cluster{zc0}{\podSize}{above = 0cm of CENTER.south east, anchor=center}{3}{\zookeeper}{\rings{Internodal\\2888:3888}{2} }
   % Topic Operator
   \topicOperator{to0}{\podSize}{above = 0cm of CENTER.90, anchor=center}{}
   % CLIENT
@@ -415,28 +410,27 @@
   (cl0) edge (kc00)
   ;
   
-  \node[ above = 0 cm of zc01.155, 
-         anchor=center,
+  \pgfmathsetmacro\fontSize{\podSize * 5}
+  \pgfmathsetmacro\fontSep{\podSize * 4}
+
+  \node[ above right = 0.2 cm and 0.3cm of kc00.25, 
+         anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {2181};
+       ] () {Client/Broker\\(Insecure)\\9092};
        
-  \node[ above = 0 cm of kc00.25, 
-         anchor=center,
+  \node[ above right = .3 cm and 0.5cm of kc02.25, 
+         anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {9092};
+       ] () {Client/Broker\\(Secure)\\9093};
+         
+  \node[ above left = .3 cm and 0.5cm of zc01.155, 
+         anchor=center, align=center,
+         font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
+       ] () {Client/Zookeeper\\2181};
        
-  \node[ above = 0 cm of kc02.25, 
-         anchor=center,
-         font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {9093};
-  
-  
-  \legend{L0}{\lSize}{below left = 1.85 cm and 4.5 cm of CENTER.270, anchor=center}{right}
-  
-  %\node[ above right = 3.5cm and -1.5cm of hw0,  
-  %       align=center, 
-  %       font=\bfseries
-  %     ] (Title) {\Huge Strimzi\\Kafka Operator\\Architecture};
+  \pgfmathsetmacro\legendRec{\midCircle*1.2}
+  \pgfmathsetmacro\lSize{\diagramSize*0.20}
+  \legend{L0}{\lSize}{below = 1.5 cm of CENTER.270, anchor=center}{\legendRec}
 
 \end{tikzpicture}
 
