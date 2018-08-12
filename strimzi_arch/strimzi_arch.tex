@@ -1,404 +1,31 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILE: strimzi_arch.tex
+% DESC: Displays Strimzi architecture and components 
+%       overview
+%
+% TODO:
+%   - Refactor 
+%   - Cleanup/Abstract Kafka Brokers
+%   - Cleanup/Abstract CRDs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[ tikz,
                 border=5mm,
                 %convert={outfile=strimzi_arch.svg}
                ]{standalone}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{tikz}
-\usetikzlibrary{intersections}
-\usetikzlibrary{positioning}
-\usetikzlibrary{fit}
-\usetikzlibrary{shapes}
-\usetikzlibrary{calc}
-\usetikzlibrary{matrix}
-\usepackage{fontawesome}
-\usetikzlibrary{backgrounds}
-%\usepackage{color}
-%\usepackage[dvipsnames]{xcolor}
-%\usepackage{xstring}
 
-\pgfdeclarelayer{background}
-\pgfdeclarelayer{foreground}
-\pgfsetlayers{background,main,foreground}
-  
-\definecolor{ClusterOperatorColor}{RGB}{0,127,189}  
-\definecolor{TopicOperatorColor}{RGB}{0,51,71}
-\definecolor{ZookeeperColor}{RGB}{11,102,35}
-\definecolor{HardwareColor}{RGB}{0,0,51}
+\input{../functions/functions.tex}
 
 \begin{document}
 
-\newcommand{\kafka}[4] {% {Id}{Size}{Location}
-  \initVars{kafka}{#1}{#2}{#3}
-  
-  \pgfmathsetmacro\msize{\kafkaSize*0.15}
-  \pgfmathsetmacro\thickness{\msize*2.0}
-  \pgfmathsetmacro\cthickness{\thickness*0.9} 
-  \pgfmathsetmacro\dis{\msize * 0.2} 
-   
-  \tikzstyle{b} = [circle, inner sep=0pt, thick, line width=\thickness mm, minimum size=\msize cm]
-  \tikzstyle{m} = [b, draw= black, fill = white]
-
-  \node[ kafkaLocation,
-         minimum width=\kafkaSize cm, 
-         minimum height=\kafkaSize cm
-       ] (\kafkaId) {};
-  
-  \begin{pgfonlayer}{foreground}
-    \node[m, above = 0 cm of \kafkaId.center, anchor=center] (\kafkaId_M) {};
-    \node[m, above = \dis cm of \kafkaId_M] (\kafkaId_m0) {};
-    \node[m, above right = \dis cm of \kafkaId_M.15] (\kafkaId_m1) {};
-    \node[m, below right = \dis cm of \kafkaId_M.345] (\kafkaId_m2) {};
-    \node[m, below = \dis cm of \kafkaId_M] (\kafkaId_m3) {};
-    \node[b, above left = \dis cm of \kafkaId_M.165] (\kafkaId_m4) {};
-
-    \foreach \x/\y in {90/0,30/1, 330/2, 270/3} {
-      \draw [line width=\cthickness mm] (\kafkaId_M.\x) edge (\kafkaId_m\y);
-    }
-  \end{pgfonlayer}
-  %\node[fit=(\kafkaId_M)(\kafkaId_m0)(\kafkaId_m1)(\kafkaId_m2)(\kafkaId_m3)(\kafkaId_m4)] (\kafkaId) {};
-}
-
-\newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{color}
-  \initVars{kafkaPod}{#1}{#2}{#3}
-  \tikzstyle{kafkaPodColor} = [fill=yellow]     % #4 = color
-    
-  \pgfmathsetmacro\kafkaPodSize{\kafkaPodSize} 
-   % Can't pass \kafkaPodLocation 
-  \kafka{\kafkaPodId_0}{\kafkaPodSize}{#3}{#4}
-  \pgfmathsetmacro\kafkaPodSep{- \kafkaPodSize * 2.5} 
-  
-  \begin{pgfonlayer}{main}
-    \node[
-           circle, 
-           inner sep = \kafkaPodSep mm,
-           minimum size = \kafkaPodSize cm,
-           color=black, 
-           kafkaPodColor,
-           draw=white,
-           fit=(\kafkaPodId_0)
-         ] (\kafkaPodId) {};
-  \end{pgfonlayer}
-}
-
-\newcommand{\disk}[4] {% {Id}{Size}{Location}{color}
-  \initVars{disk}{#1}{#2}{#3}
-  \tikzstyle{diskColor} = [#4] % #4 = color
-  
-  \pgfmathsetmacro\height{\diskSize*1.5}
-  \pgfmathsetmacro\width{\diskSize*1.3}
-  \pgfmathsetmacro\sep{\diskSize*1}
-  \pgfmathsetmacro\shift{\diskSize*0.8}
-  
-  \tikzstyle{base} = [cylinder, draw, rotate = 90, thick, inner sep = \sep mm, shift={(\shift,0)}]
-  \tikzstyle{vari} = [minimum height = \height cm, minimum width = \width cm, diskLocation, diskColor]
-  
-  \node[base, vari] (\diskId) {};
-}
-
-\newcommand{\pod}[4] {% {Id}{Size}{Location}{color}
-  \initVars{pod}{#1}{#2}{#3}
-  \tikzstyle{podColor} = [#4] % #4 = color
-  
-  \pgfmathsetmacro\ppodSize{\podSize*1.75}
-  \pgfmathsetmacro\conSize{\ppodSize*0.25}
-
-  \tikzstyle{base} = [rectangle, inner sep = 0 mm, rectangle, draw, thick]
-  \tikzstyle{vari} = [minimum height = \conSize cm, minimum width = \conSize cm, podLocation, podColor]
-  
-  % randomly generate color for pod
-  %\pgfmathparse{rnd}
-  %\pgfmathtruncatemacro{\cc}{(\operatorId)*0.4}
-  %\xdefinecolor{rColor}{rgb}{\cc, 0.7, \pgfmathresult}
-    
-  \node[base, vari] (\podId_center) {};
-  
-  \node[ circle, 
-         thick, 
-         inner sep = 0 mm, 
-         minimum size= \ppodSize cm, 
-         draw, 
-         podColor, 
-         fit=(\podId_center)
-       ] (\podId) {};
-  
-}
-\newcommand{\cube}[4] {% {Id}{Size}{Location}{color}
-  \initVars{cube}{#1}{#2}{#3}
-  \def\color{#4}
-  
-  \pgfmathsetmacro\cSize{\cubeSize*0.75}
-    
-  \def\x{\cSize * 0.4}
-  \def\y{\cSize * 0.5}
-  \def\z{\cSize * 1.0}
-
-  \tikzstyle{coor} = [shape=coordinate]
-  \node[circle, cubeLocation] (\cubeId) {};
-
-  \node[coor, below left =\x cm and \y cm of \cubeId] (S_\cubeId) {S};
-  \node[coor, above=\z cm and 0cm of S_\cubeId] (A_\cubeId) {A};
-  \node[coor, above right=\y cm and \x cm of A_\cubeId] (B_\cubeId) {B};
-  \node[coor, above right=\y cm and \x cm of S_\cubeId] (C_\cubeId) {C};
-  \node[coor, right=0.0cm and \z cm of S_\cubeId] (D_\cubeId) {D};
-  \node[coor, above=\z cm and 0.0cm of D_\cubeId] (E_\cubeId) {E};
-  \node[coor, above right=\y cm and \x cm of E_\cubeId] (F_\cubeId) {F};
-  \node[coor, above right=\y cm and \x cm of D_\cubeId] (G_\cubeId) {G};
-
-  \tikzstyle{face} = [black]
-
-  \draw[face, fill=\color!30] (S_\cubeId) -- (C_\cubeId) -- (G_\cubeId) -- (D_\cubeId) -- cycle; % Bottom Face
-  \draw[face, fill=\color!30] (S_\cubeId) -- (A_\cubeId) -- (E_\cubeId) -- (D_\cubeId) -- cycle; % Back Face
-  \draw[face, fill=\color!10] (S_\cubeId) -- (A_\cubeId) -- (B_\cubeId) -- (C_\cubeId) -- cycle; % Left Face
-  \draw[face, fill=\color!20,opacity=0.8] (D_\cubeId) -- (E_\cubeId) -- (F_\cubeId) -- (G_\cubeId) -- cycle; % Right Face
-  \draw[face, fill=\color!20,opacity=0.6] (C_\cubeId) -- (B_\cubeId) -- (F_\cubeId) -- (G_\cubeId) -- cycle; % Front Face
-  \draw[face, fill=\color!20,opacity=0.8] (A_\cubeId) -- (B_\cubeId) -- (F_\cubeId) -- (E_\cubeId) -- cycle; % Top Face
-
-  \node[coor] (\cubeId_center) at ($(S_\cubeId)!0.5!(F_\cubeId)$)  {};
-  \node[coor] (\cubeId_north)  at ($(A_\cubeId)!0.5!(F_\cubeId)$)  {};
-  \node[coor] (\cubeId_east)   at ($(D_\cubeId)!0.5!(F_\cubeId)$)  {};
-  \node[coor] (\cubeId_south)  at ($(S_\cubeId)!0.5!(G_\cubeId)$)  {};
-  \node[coor] (\cubeId_west)   at ($(S_\cubeId)!0.5!(B_\cubeId)$)  {};
-
-  %\node[fit=(S_\cubeId)(F_\cubeId)] (\cubeId) {};
-  %\tikzstyle{cube}= [fit=(S_\cubeId)(A_\cubeId)(B_\cubeId)(C_\cubeId)(D_\cubeId)(E_\cubeId)(F_\cubeId)(G_\cubeId)];
-  %\node[circle, draw, cubeLocation] (test\cubeId) {};
-}
-
-\newcommand{\operator}[4] {% {Id}{Size}{Location}{color}
-  \initVars{operator}{#1}{#2}{#3}
-  \tikzstyle{operatorColor} = [#4] % #4 = color
-  
-  \pgfmathsetmacro\bodyLength{\operatorSize*1.20}
-  \pgfmathsetmacro\bodyWidth{\operatorSize*0.25}
-  \pgfmathsetmacro\limbLength{\bodyLength*0.70}
-  \pgfmathsetmacro\limbWidth{\bodyWidth*0.55}
-  \pgfmathsetmacro\armLength{\limbLength*1.75}
-  \pgfmathsetmacro\operatorHeadDis{\operatorSize * 0.38}
-  
-  \tikzstyle{base} = [fill=black, inner sep=0pt,  minimum size = \operatorSize, operatorColor]
-  
-  \tikzstyle{head} = [base, circle, minimum size = \operatorSize cm]
-  \tikzstyle{body} = [base, rectangle, minimum height = \bodyLength cm,  minimum width = \bodyWidth cm]
-  \tikzstyle{limb} = [base, rectangle, minimum height = \limbLength cm,  minimum width = \limbWidth cm]
-  \tikzstyle{arm}  = [limb, minimum height = \armLength cm]
-  \tikzstyle{leg}  = [limb, rotate=90]
-   
-  \node[ operatorLocation,
-         circle,
-         minimum height = \operatorSize,
-         minimum width =  \operatorSize
-         ] (\operatorId) {};
-  
-  \node[head, above = \operatorHeadDis cm of \operatorId.center] (head_\operatorId) {};
-    
-  \node[body, below = 0 cm of head_\operatorId.south] (body_\operatorId) {};
-  
-  %\node[arm,  rotate = 120,  above right = 0 cm of body.east, anchor = east] (r_arm) {};
-  %\node[arm,  rotate = -120, above left  = 0 cm of body.west, anchor = east]  (l_arm) {};
-  
-  \node[arm,  rotate = 90,  above = 0cm of body_\operatorId.center, anchor = center] (arm_\operatorId) {};
-  
-  \node[leg, rotate = 315, below right = 0 cm of body_\operatorId.south] (r_leg_\operatorId) {};
-  \node[leg, rotate = 225, below left  = 0 cm of body_\operatorId.south]  (l_leg_\operatorId) {};
-  
-  %\node[ 
-  %      fit=(head_\operatorId)(body_\operatorId)(arm_\operatorId)(r_leg_\operatorId)(l_leg_\operatorId)
-  %     ] (\operatorId_center) {};
-}
-
-\newcommand{\clusterOperator}[3] {% {Id}{Size}{Location}{color}
-  \initVars{clusterOperator}{#1}{#2}{#3}
-  
-  \pgfmathsetmacro\coSize{\clusterOperatorSize * 0.20}
-  \pgfmathsetmacro\objSize{\coSize * 0.5}
-  \pgfmathsetmacro\dis{\coSize * 1.5}
-
-  \pgfmathsetmacro\clusterOperatorSep{- \clusterOperatorSize * 1.75}
-  
-  \node[ circle, 
-         inner sep = \clusterOperatorSep mm,
-         minimum height = \clusterOperatorSize cm,
-         minimum width = \clusterOperatorSize cm,
-         draw=white, 
-         fill=ClusterOperatorColor,
-         clusterOperatorLocation,
-       ] (\clusterOperatorId) {};
-  
-  \tikzstyle{\clusterOperatorId Position} = [above = 0 cm of \clusterOperatorId.center, anchor=center]
-  
-  \begin{pgfonlayer}{foreground}
-    \operator{\clusterOperatorId Op}{\coSize}{\clusterOperatorId Position}{color=white}
-    \disk{\clusterOperatorId_d0}{\objSize}{left = \dis cm of \clusterOperatorId Op.center}{color=white}
-    \pod{\clusterOperatorId_p0}{\objSize}{right = \dis cm of \clusterOperatorId Op.center}{color=white}
-    %\cube{\coID_cube}{\coSize}{black}{above = \dis cm of \coID.north}; % location
-  \end{pgfonlayer}
-  
-}
-
-\newcommand{\topicOperator}[4] {% {Id}{Size}{Location}{color}
-  \initVars{topicOperator}{#1}{#2}{#3}
-  \tikzstyle{toColor} = [#4] % #4 = color
-    
-  \pgfmathsetmacro\toSize{\topicOperatorSize * 0.20}
-  \pgfmathsetmacro\dis{\topicOperatorSize * 0.25 }
-  \pgfmathsetmacro\scale{\toSize / 3}
-
-  \tikzstyle{partition} = [rectangle, inner sep = 0]
-  \tikzstyle{grid} = [scale=\scale, thin, draw=white]
-  
-   \node[ circle, 
-          inner sep = 0 mm,
-          minimum height = \topicOperatorSize cm,
-          minimum width = \topicOperatorSize cm, 
-          draw=white,
-          fill=TopicOperatorColor,
-          topicOperatorLocation
-        ] (\topicOperatorId) {};
-  
-  \tikzstyle{\topicOperatorId Position} = [above = 0 cm of \topicOperatorId.center, anchor=center]
-  
-  \operator{\topicOperatorId Op}{\toSize}{\topicOperatorId Position}{fill=white}
-  
-  \begin{pgfonlayer}{foreground}
-    \node (rpart) [partition, right = \dis cm of \topicOperatorId Op.center]
-    {
-      \tikz{\draw[grid] (0,0)  grid (1,5);}
-    };
-    \node (lpart) [partition, left = \dis cm of \topicOperatorId Op.center] (lpart)
-    {
-      \tikz{\draw[grid] (0,0)  grid (1,5);}
-    };
-  \end{pgfonlayer}
-  
-}
-
-\newcommand{\configMap}[3] {% {Id}{Size}{Location}
-  \initVars{configMap}{#1}{#2}{#3}
-  
-  \pgfmathsetmacro\scale{\configMapSize * 1.3}
-  \definecolor{blueprint}{RGB}{4,63,140}
-
-   \node[ configMapLocation,
-          minimum width=\configMapSize cm, 
-          minimum height=\configMapSize cm,
-          rectangle,
-          fill=blueprint,
-          rounded corners,
-          inner sep = 0 mm,
-          draw=white
-        ] (\configMapId) {};
-        
-  %\draw (0,0) node (wrench) [yscale=\scale,xscale=\scale, thick, cmLocation ] {\bcoutil};
-  \draw (0,0) node (wrench) [ yscale=\scale, 
-                              xscale=\scale,
-                              above = 0 cm of \configMapId.center,
-                              anchor = center, 
-                              color=white
-                            ] {\faWrench};
-}
-
-% Establishes consistent variable scheme by prepending all
-% variables with command name
-\newcommand{\initVars}[4] {% {Prefix}{Id}{Size}{Location}
-  \def\Prefix{#1}
-  \expandafter\def\csname \Prefix Id\endcsname{#2}
-  \expandafter\def\csname \Prefix Size\endcsname{#3}
-  \tikzstyle{\Prefix Location} = [#4]
-}
-
-\newcommand{\hardware}[3] {% {Id}{Size}{Location}
-  \initVars{hardware}{#1}{#2}{#3}
-  
-  \pgfmathsetmacro\width{\hardwareSize*2.0}
-  \pgfmathsetmacro\height{\hardwareSize*0.5}
-  \pgfmathsetmacro\osHeight{\height*3}
-  \pgfmathsetmacro\nodeDis{\hardwareSize*0.25}
-  
-  \tikzstyle{base} = [rectangle, rounded corners, minimum height = \height cm, minimum width = \width cm] 
-  
-  \node[hardwareLocation] (\hardwareId) {};
-  \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {\tiny Node};
-  
-  \begin{pgfonlayer}{background}
-    \node [ base, 
-            fill=gray!80, 
-            text=white, 
-            above = 0cm of \hardwareId_Node.north, 
-            minimum height = \osHeight cm
-          ] (\hardwareId_openshift) {};
-  \end{pgfonlayer}
-  \node[above = 0cm of \hardwareId_openshift.south, text=white] () {\tiny OpenShift};
-}
-
-\newcommand{\zookeeper}[3] { %{Id}{Size}{Location}
-  \initVars{zookeeper}{#1}{#2}{#3}
-  \pgfmathsetmacro\scale{\zookeeperSize}
-  \pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
-
-  \node[ zookeeperLocation, 
-         minimum width=\zookeeperSize cm, 
-         minimum height=\zookeeperSize cm,
-         fill=ZookeeperColor,
-         circle,
-         draw=white,
-         text=white,
-         font=\fontsize{\zookeeperFontSize}{0}\selectfont,
-       ] (\zookeeperId) {Z};
-}
-  
-\newcommand{\legend}[3] { %{Id}{Size}{Location}
-  \initVars{legend}{#1}{#2}{#3}
-  \pgfmathsetmacro\legendDis{\legendSize * 1.5}
- 
-  \node[legendLocation] (LOC) {Legend};
-  
-  \def\legendList{ \clusterOperator/coL/Cluster Operator, 
-                   \topicOperator/toL/Topic Operator, 
-                   \kafkaPod/kpL/Kafka Broker Pod, 
-                   \zookeeper/zL/Zookeeper Pod, 
-                   \configMap/cmL/ConfigMap
-                 }
-  \pgfmathsetmacro\iter{0.2}
-    
-  \foreach \key/\id/\labe in \legendList {
-    \key{\id}{\diagramSize}{below = \iter * \legendDis cm of LOC}{}
-    \node[right = 0.25 cm of \id ] (\id_label) {\labe};
-    
-    \pgfmathparse{\iter + 0.8}
-    \global\let\iter=\pgfmathresult
-  }
-  
-  \node[draw, dotted, thick, fit=(coL)(toL)(kpL)(zL)(kpL_label)(cmL)] () {};
-}
-  
-%\begin{tikzpicture}
-  %\clusterOperator{co0}{2}{}{}
-  %\topicOperator{to0}{2}{right = 1.25 cm of co0.center}{}
-  %\kafkaPod{kp0}{2}{right = 1.25 cm of to0.center}{fill=yellow}
-  %\zookeeper{zk0}{2}{right = 1.25 cm of kp0.center}{}
-  %\configMap{zcm0}{2}{right = 1.25  cm of zk0.center}{}
-  %\node[draw=black, dotted, fit=(co0)(to0)(kp0)(zk0)] () {};
-  %\testt{f}
-  %  \hardware{hw0}{1.0}{}
-  %\cube{ww}{10}{}{blue}
-  %\kafkaPod{www}{1}{}{}
-  %\kafka{KKK}{1}{}
-%\end{tikzpicture}
-
-%\iffalse
-
-%\def\centerarc[#1](#2)(#3:#4:#5)% Syntax: [draw options] (center) (initial angle:final %angle:radius)
-%    { \draw[#1] ($(#2)+({#5*cos(#3)},{#5*sin(#3)})$) arc (#3:#4:#5); }
-
-
 \begin{tikzpicture}
   \pgfmathsetmacro\diagramSize{.8}
+  \pgfmathsetmacro\fontSize{\diagramSize * 5}
+  \pgfmathsetmacro\fontSep{\diagramSize * 3}
   
   \pgfmathsetmacro\midCircle{10}
   \pgfmathsetmacro\innerCircle{\midCircle * 0.65}
   \pgfmathsetmacro\outerCircle{\midCircle * 1.35}
+
   \pgfmathsetmacro\ssInner{\innerCircle / 2}
   \pgfmathsetmacro\ssOuter{\outerCircle / 2}
   \def\ssColor{magenta!50}
@@ -408,18 +35,35 @@
   \node[circle, minimum size=\midCircle cm, draw, dotted] (CENTER) {};
   \node[circle, minimum size= \innerCircle cm, draw, dotted]  (INNERCIRCLE) {};
   \node[circle, minimum size= \outerCircle cm, draw, dotted]  (OUTERCIRCLE) {};
+  \pgfmathsetmacro\outerRectangleHeight{\outerCircle * 1.1}
+  \pgfmathsetmacro\outerRectangleWidth{\outerCircle * 1.25}
+  \node[ rectangle, 
+         minimum height=\outerRectangleHeight cm, 
+         minimum width=\outerRectangleWidth cm, 
+         draw, 
+         dotted
+       ] (OUTERRECTANGLE) {};
+       
+  \pgfmathsetmacro\innerRectangleHeight{\midCircle * 1.0}
+  \pgfmathsetmacro\innerRectangleWidth{\midCircle * 1.0}
+  \node[ rectangle, 
+         minimum height=\innerRectangleHeight cm, 
+         minimum width=\innerRectangleWidth cm, 
+         draw, 
+         dotted
+       ] (INNERRECTANGLE) {};
+       
   %\node[circle, minimum size= 25 cm, draw, dotted]  (OTERCIRCLE) {};
   
   \hardware{hw000}{1.0}{left=1.2cm of CENTER.center, anchor=center}
 
   \clusterOperator{co0}{\diagramSize}{right = 0.15cm of hw000_openshift.mid}{}
-  \configMap{cm0}{\diagramSize}{left = 0.15cm of hw000_openshift.mid}
+  \configMap{cm0}{\diagramSize}{left = 0.15cm of hw000_openshift.mid}{}
   
   \hardware{hw111}{1.0}{right=1.2cm of CENTER.center, anchor=center}
   \topicOperator{to0}{\diagramSize}{right = 0.15cm of hw111_openshift.mid}{}
-  \configMap{cm1}{\diagramSize}{left = 0.15cm of hw111_openshift.mid}
+  \configMap{cm1}{\diagramSize}{left = 0.15cm of hw111_openshift.mid}{}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
 
   \newcommand{\mylist}{hw2/kp0/z0/90, hw3/kp1/z1/180, hw4/kp2/z2/270} 
   
@@ -436,8 +80,8 @@
     \def\zId{z\nodeNum}
     
     \hardware{\hId}{1.0}{above=0cm of CENTER.\angle, anchor=center}
-    \kafkaPod{\kId}{\diagramSize}{right = 0.15cm of \hId_openshift.mid}{fill=yellow}
-    \zookeeper{\zId}{\diagramSize}{left = 0.15cm of \hId_openshift.mid}
+    \kafkaPod{\kId}{\diagramSize}{right = 0.15cm of \hId_openshift.mid}{}
+    \zookeeper{\zId}{\diagramSize}{left = 0.15cm of \hId_openshift.mid}{}
     
     \pgfmathparse{\angle + 180}
     \global\let\iter=\pgfmathresult
@@ -480,60 +124,144 @@
       \pgfpathmoveto{\pgfpointanchor{\zIdSS}{center}}
       \pgfpatharcto{\ssOuter cm}{\ssOuter cm}{0}{0}{1}{\pgfpointanchor{\zIdSSf}{center}}
       \pgfusepath{draw}
-
     }
    
   \end{scope}
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %\node[draw, dotted, thick, inner sep = 1 mm, fit=(z0)(z1)(z2)] (ss0) {};
-  %\node[draw, dotted, thick, inner sep = 1 mm, fit=(kp0)(kp1)(kp2)] (ss1) {};
+  \def\legendList{ \clusterOperator/coL/Cluster Operator, 
+                   \topicOperator/toL/Topic Operator, 
+                   \kafkaPod/kpL/Kafka Broker Pod, 
+                   \zookeeper/zL/Zookeeper Pod, 
+                   \configMap/cmL/ConfigMap
+                 }
+  \legend{L0}{1}{above = 0cm of OUTERRECTANGLE.south, anchor=center}{\outerCircle}{\legendList}
   
-  %\node[below = 1.25cm of to0] (place0) {};
-  %\node[below = 1.50cm of ss0] (place1) {};
-  %\node[below = 1.75cm of ss1] (place2) {};
-  
-  
-  %\draw [->]  (co0.165) -- (cm0.22);
-  %\draw [->]  (cm0.345) -- (co0.195);
+  \node[ above  = 0 cm of OUTERRECTANGLE.north west,
+         anchor=center,  
+         align=center, 
+         font=\fontsize{12 pt}{10 pt}\bfseries\selectfont,
+       ] (Title) {\fontsize{30 pt}{5pt}\bfseries\selectfont
+                  Strimzi\\Kafka Operator\\Architecture};
 
-  %\draw [->]  (to0.165) -- (cm1.22);
-  %\draw [->]  (cm1.345) -- (to0.195);
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Kafka Broker
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \pgfmathsetmacro\brokerOutline{\innerCircle * 0.75}
+  \node[ rectangle,
+         minimum size = \brokerOutline cm,
+         draw, 
+         dotted, 
+         above = 0cm of INNERRECTANGLE.north east, anchor=center
+       ] (BROKER_OUTLINE) {};
+  \pgfmathsetmacro\innerBrokerOutline{\brokerOutline * 0.5}
+  \node[ circle,
+         minimum size = \innerBrokerOutline cm,
+         %draw, 
+         %dotted, 
+         above = 0cm of BROKER_OUTLINE.center, anchor=center
+       ] (INNER_BROKER_OUTLINE) {};
   
-  %\node[circle, dotted, minimum width = 7cm, draw=black, fit=(hw0)(hw1)] (T) {};
+  \pgfmathsetmacro\brokerHeight{\brokerOutline * 0.5}
+  \pgfmathsetmacro\brokerWidth{\brokerOutline * 0.25}
+  \node[ rectangle,
+         minimum height = \brokerHeight cm,
+         minimum width  = \brokerWidth cm,
+         draw, 
+         dotted, 
+         above = 0cm of INNER_BROKER_OUTLINE.west, anchor=center
+       ] (BROKER) {};
+       
+  \def\partitionList{ $(BROKER.north)!0.5!(BROKER.center)$, 
+                   BROKER.center, 
+                   $(BROKER.center)!0.5!(BROKER.south)$
+                }
+       
+  %\tikzstyle{partition} = [rectangle, inner sep = 0]
   
-  %\path[->, thin, to path={|- (\tikztotarget)}]
-  %  (co0.320) edge (place0.center)
-  %  (place0.center) edge (to0.south)
-  %  (co0.280) edge (place1.center)
-  %  (place1.center) edge (ss0.south)
-  %  (co0.250) edge (place2.center)
-  %  (place2.center) edge (ss1.south);
-     
-  %\path[->, thin, to path={-| (\tikztotarget)}]
-   %(to0.north) edge (kp0.135)
-   %(to0.north) edge (z0.190)
-  % (to0.north) edge (kp1.south)
-  % (to0.north) edge (z1.south)
-  % (to0.north) edge (kp2.north)
-  % (to0.north) edge (z2.north);
-   
-  %\path[->, thin, to path={|- (\tikztotarget)}]
-  % (to0.north) edge (kp0.south)
-  % (to0.120) edge (z0.190);
+  % Randomly generate partition length
+  \tikzstyle{grid} = [scale=0.02cm, thin, draw]
+  \foreach \pos [count=\xi] in \partitionList {
+    \node[ rectangle,
+           draw,
+           above = 0cm of \pos,
+           anchor=center
+         ] (p\xi) {p\xi};
+    \node[draw, inner sep = 0, right = 0.7 cm of p\xi] (p\xi record)
+    {
+      \tikz{\draw[grid] (0,0)  grid (4,1);}
+    };
+    \path[->] (p\xi.east) edge (p\xi record.west);
   
-  \legend{L0}{1}{below right= 0.75cm and 3.0cm of CENTER.0, anchor=center}
+  }  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Custom Resource Definitions
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \pgfmathsetmacro\crdOutline{\innerCircle * 0.75}
+  \node[ rectangle,
+         minimum size = \crdOutline cm,
+         draw, 
+         dotted, 
+         above = 0cm of INNERRECTANGLE.east, anchor=center
+       ] (CRD_OUTLINE) {};
+  \pgfmathsetmacro\innerCrdOutline{\crdOutline * 0.5}
+  \node[ circle,
+         minimum size = \innerCrdOutline cm,
+         %draw, 
+         %dotted, 
+         above = 0cm of CRD_OUTLINE.center, anchor=center
+       ] (INNER_CRD_OUTLINE) {};
   
-  %\node[ above right = 3.5cm and -1.5cm of hw0,  
-  %       align=center, 
-  %       font=\bfseries
-  %     ] (Title) {\Huge Strimzi\\Kafka Operator\\Architecture};
+  \def\crdList{ kafka.spec.kafka.replicas,
+                kafka.spec.kafka.image,
+                kafka.spec.kafka.brokerRackInitImage,
+                kafka.spec.kafka.livenessProbe.initialDelaySeconds,
+                kafka.spec.kafka.livenessProbe.timeoutSeconds,
+                kafka.spec.kafka.readinessProbe.initialDelaySeconds,
+                kafka.spec.kafka.readinessProbe.timeoutSeconds,
+                kafka.spec.kafka.config,
+                kafka.spec.kafka.storage,
+                kafka.spec.kafka.metrics,
+                kafka.spec.kafka.logging,
+                kafka.spec.kafka.resources,
+                kafka.spec.kafka.jvmOptions,
+                kafka.spec.kafka.rack,
+                kafka.spec.kafka.affinity,
+                kafka.spec.kafka.tlsSidecar.image,
+                kafka.spec.kafka.tlsSidecar.resources,
+                kafka.spec.zookeeper.replicas,
+                kafka.spec.zookeeper.image,
+                %kafka.spec.zookeeper.livenessProbe.initialDelaySeconds,
+                %kafka.spec.zookeeper.readinessProbe.initialDelaySeconds,
+                %kafka.spec.zookeeper.config,
+                %spec.zookeeper.storage,
+                \textperiodcentered \textperiodcentered \textperiodcentered
+              }
+  \pgfmathsetmacro\sep{0}
+  \foreach \crd [count=\xi] in \crdList {
+    \node[  below = 0.4 cm of CRD_OUTLINE.north, 
+            anchor=center,
+            text width = 4.4cm,
+            align=left,
+            text=black!85,
+            font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont,
+            yshift = - \sep cm
+          ] () {\crd};
+    \pgfmathparse{\sep + 0.2}
+    \global\let\sep=\pgfmathresult  
+  }
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \pgfmathsetmacro\kadkaConnectOutline{\innerCircle * 0.75}
+  \node[ rectangle,
+         minimum size = \crdOutline cm,
+         draw, 
+         dotted, 
+         above = 0cm of OUTERRECTANGLE.west, anchor=center
+       ] (KAFKA_CONNECT_OUTLINE) {};
 
+    
 \end{tikzpicture}
- %\fi
-
- % fix arrows
- % Diagram orientation
- % curved fit
 
 \end{document}
