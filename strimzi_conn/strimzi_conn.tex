@@ -51,14 +51,14 @@
   
   \path[S_CONN]  
   (cl0) edge (kc02)
-  (cl0) edge (zc01)
+  %(cl0) edge (zc01)
   (kc02) edge (zc01)
   (to0) edge (kc02)
   (to0) edge (zc01)
   ;
   
   \path[IS_CONN]  
-  (to0) edge (kc00)
+  %(to0) edge (kc00)
   (cl0) edge (kc00)
   ;
   
@@ -75,7 +75,7 @@
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
        ] () {Client/Broker\\(Secure)\\9093};
          
-  \node[ above left = .3 cm and 0.5cm of zc01.155, 
+  \node[ above left = .2 cm and 0.5cm of zc01.155, 
          anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
        ] () {Client/Zookeeper\\2181};
