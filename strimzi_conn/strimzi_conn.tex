@@ -20,7 +20,7 @@
 
 \begin{tikzpicture}
   \pgfmathsetmacro\diagramSize{3.0}
-  \pgfmathsetmacro\midCircle{\diagramSize*2}
+  \pgfmathsetmacro\midCircle{\diagramSize*1.5}
   \pgfmathsetmacro\structHeight{\diagramSize*0.85}
   \pgfmathsetmacro\podSize{\diagramSize*0.25}
   
@@ -37,21 +37,30 @@
   \cluster{kc0}{\podSize}{above = 0cm of CENTER.south west, anchor=center}{3}{\kafkaPod}{\rings{Interbroker\\9091}{1} }
   % Zoo Cluster   340?
   \cluster{zc0}{\podSize}{above = 0cm of CENTER.south east, anchor=center}{3}{\zookeeper}{\rings{Internodal\\2888:3888}{2} }
+  
+  % placement node
+  \node[]  (placement_node) at ($(kc00)!0.5!(zc00)$)  {};
   % Topic Operator
-  \topicOperator{to0}{\podSize}{above = 0cm of CENTER.90, anchor=center}{}
+  \topicOperator{to0}{\podSize}{above = 0cm of placement_node, anchor=center}{}
   % CLIENT
-  \pgfmathsetmacro\fontSize{\podSize * 7}
-  \pgfmathsetmacro\fontSep{\podSize * 6}
+  \pgfmathsetmacro\fontSize{\podSize * 5}
+  \pgfmathsetmacro\fontSep{\podSize * 3.}
+  %\node[ circle, 
+  %       fill=orange, 
+  %       text=white, 
+  %       minimum width=\podSize cm,
+  %       font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont,
+  %     ]  (cl0)  at ($(kc00)!0.5!(zc00)$)  {Client};
   \node[ circle, 
          fill=orange, 
          text=white, 
          minimum width=\podSize cm,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont,
-       ]  (cl0)  at ($(kc00)!0.5!(zc00)$)  {Client};
+         below = 0.75cm of CENTER.130, anchor=center,
+       ]  (cl0) {\textbf{Client} };
   
   \path[S_CONN]  
   (cl0) edge (kc02)
-  %(cl0) edge (zc01)
   (kc02) edge (zc01)
   (to0) edge (kc02)
   (to0) edge (zc01)
@@ -62,28 +71,28 @@
   (cl0) edge (kc00)
   ;
   
-  \pgfmathsetmacro\fontSize{\podSize * 5}
-  \pgfmathsetmacro\fontSep{\podSize * 4}
+  \pgfmathsetmacro\fontSize{\podSize * 4}
+  \pgfmathsetmacro\fontSep{\podSize * 5}
 
-  \node[ above right = 0.2 cm and 0.3cm of kc00.25, 
+  \node[ above right = 0.4 cm and -0.1cm of kc00.25, 
          anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {Client/Broker\\(Insecure)\\9092};
+       ] () {\bfseries{Client/Broker}\\\bfseries{9092}};
        
-  \node[ above right = .3 cm and 0.5cm of kc02.25, 
+  \node[ above right = .3 cm and 0.4cm of kc02.25, 
          anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {Client/Broker\\(Secure)\\9093};
+       ] () {\bfseries{Client/Broker}\\\bfseries{9093}};
          
-  \node[ above left = .2 cm and 0.5cm of zc01.155, 
+  \node[ above left = .3 cm and 0.4cm of zc01.155, 
          anchor=center, align=center,
          font=\fontsize{\fontSize pt}{\fontSep pt}\selectfont
-       ] () {Client/Zookeeper\\2181};
+       ] () {\bfseries{Client/Zookeeper}\\\bfseries{2181}};
        
   \pgfmathsetmacro\legendRec{\midCircle*1.2}
   \pgfmathsetmacro\lSize{\diagramSize*0.20}
     
-  \def\legendList{ \topicOperator/toL/Topic Operator, 
+  \def\legendList{ \topicOperator/toL/Entity Operator, 
                    \kafkaPod/kpL/Kafka Broker Pod, 
                    \zookeeper/zL/Zookeeper Pod,
                    \tls/tL/TLS connection,
