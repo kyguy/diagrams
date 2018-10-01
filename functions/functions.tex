@@ -39,6 +39,13 @@
 %\iffalse
 %\fi
 
+% Credit  https://tex.stackexchange.com/questions/37709/how-can-i-know-if-a-node-is-already-defined
+\makeatletter
+\long\def\ifnodedefined#1#2#3{%
+    \@ifundefined{pgf@sh@ns@#1}{#3}{#2}%
+}
+\makeatother
+
 % Establishes consistent variable scheme by prepending all
 % variables with command name
 \newcommand{\initVars}[4] {% {Prefix}{Id}{Size}{Location}
@@ -99,6 +106,79 @@
            fit=(\kafkaPodId_0),
            label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
          ] (\kafkaPodId) {};
+  \end{pgfonlayer}
+}
+
+\newcommand{\kafkaConnect}[4] {% {Id}{Size}{Location}
+  \initVars{kafka}{#1}{#2}{#3}
+  
+  \pgfmathsetmacro\msize{\kafkaSize*0.15}
+  \pgfmathsetmacro\thickness{\msize*2.0}
+  \pgfmathsetmacro\cthickness{\thickness*0.9} 
+  \pgfmathsetmacro\dis{\msize * 0.2} 
+  \pgfmathsetmacro\ddis{\msize * 0.5} 
+   
+  \tikzstyle{b} = [circle, inner sep=0pt, thick, line width=\thickness mm, minimum size=\msize cm]
+  \tikzstyle{m} = [b, draw= black, fill = white]
+
+  \node[ kafkaLocation,
+         minimum width=\kafkaSize cm, 
+         minimum height=\kafkaSize cm
+       ] (\kafkaId) {};
+  
+  \begin{pgfonlayer}{foreground}
+    \node[m, above = 0 cm of \kafkaId.center, anchor=center] (\kafkaId_mcore) {};
+      %\node[right = \ddis cm of \kafkaId_mcore] (\kafkaId_mcore_east) {};
+      \node[left  = \ddis cm of \kafkaId_mcore] (\kafkaId_mcore_west) {};
+    \node[m, above = \dis cm of \kafkaId_mcore] (\kafkaId_m0) {};
+      %\node[right = \ddis cm of \kafkaId_m0] (\kafkaId_m0_east) {};
+      \node[left  = \ddis cm of \kafkaId_m0] (\kafkaId_m0_west) {};
+    \node[m, above right = \dis cm of \kafkaId_mcore.15] (\kafkaId_m1) {};
+      \node[right = \ddis cm of \kafkaId_m1] (\kafkaId_m1_east) {};
+    \node[m, below right = \dis cm of \kafkaId_mcore.345] (\kafkaId_m2) {};
+      \node[right = \ddis cm of \kafkaId_m2] (\kafkaId_m2_east) {};
+    \node[m, below = \dis cm of \kafkaId_mcore] (\kafkaId_m3) {};
+      %\node[right = \ddis cm of \kafkaId_m3] (\kafkaId_m3_east) {};
+      \node[left = \ddis cm of \kafkaId_m3] (\kafkaId_m3_west) {};
+    \node[b, above left = \dis cm of \kafkaId_mcore.165] (\kafkaId_m4) {};
+    
+    \foreach \x/\y in {90/0,30/1, 330/2, 270/3} {
+      \draw [line width=\cthickness mm] (\kafkaId_mcore.\x) edge (\kafkaId_m\y);
+    }
+    
+    \foreach \x/\y in {0/core, 90/0, 30/1, 330/2, 270/3} {
+      \ifnodedefined{\kafkaId_m\y_east}{
+        \draw [line width=\cthickness mm] (\kafkaId_m\y.east) edge (\kafkaId_m\y_east);
+      }{}
+      \ifnodedefined{\kafkaId_m\y_west}{
+        \draw [line width=\cthickness mm] (\kafkaId_m\y.west) edge (\kafkaId_m\y_west);
+      }{}
+    }
+  \end{pgfonlayer}
+  %\node[fit=(\kafkaId_M)(\kafkaId_m0)(\kafkaId_m1)(\kafkaId_m2)(\kafkaId_m3)(\kafkaId_m4)] (\kafkaId) {};
+}
+
+\definecolor{kafkaConnectPod}{RGB}{219,112,147}
+%\definecolor{mycolor}{RGB}{255,51,76}
+\newcommand{\kafkaConnectPod}[4]{% {Id}{Size}{Location}{label}
+  \initVars{kafkaConnectPod}{#1}{#2}{#3}
+  \tikzstyle{kafkaConnectPodColor} = [fill=kafkaConnectPod] % #4 = color
+    
+  \pgfmathsetmacro\kafkaConnectPodSize{\kafkaConnectPodSize} 
+   % Can't pass \kafkaPodLocation 
+  \kafkaConnect{\kafkaConnectPodId_0}{\kafkaConnectPodSize}{#3}{#4}
+  \pgfmathsetmacro\kafkaConnectPodSep{- \kafkaConnectPodSize * 2.5} 
+  
+  \begin{pgfonlayer}{main}
+    \node[ circle, 
+           inner sep = \kafkaConnectPodSep mm,
+           minimum size = \kafkaConnectPodSize cm,
+           color=black, 
+           kafkaConnectPodColor,
+           draw=white,
+           fit=(\kafkaConnectPodId_0),
+           label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+         ] (\kafkaConnectPodId) {};
   \end{pgfonlayer}
 }
 
@@ -251,8 +331,9 @@
   \tikzstyle{base} = [rectangle, rounded corners, minimum height = \height cm, minimum width = \width cm] 
   
   \node[hardwareLocation] (\hardwareId) {};
-  \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {\tiny Node};
-  
+  %\node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {\tiny Node};
+   \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {Node};
+   
   \begin{pgfonlayer}{background}
     \node [ base, 
             fill=gray!80, 
@@ -261,7 +342,12 @@
             minimum height = \osHeight cm
           ] (\hardwareId_openshift) {};
   \end{pgfonlayer}
-  \node[above = 0cm of \hardwareId_openshift.south, text=white] () {\tiny OpenShift};
+
+  %\node[above = 0cm of \hardwareId_openshift.south, text=white,
+  %      label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont Op}}
+  %     ] () {OpenShift};  
+  \node[above = 0cm of \hardwareId_openshift.south, text=white] () {OpenShift};
+  %\node[above = 0cm of \hardwareId_openshift.south, text=white] () {\tiny OpenShift};
 }
 
 \newcommand{\zookeeper}[4] { %{Id}{Size}{Location}{label}
@@ -303,11 +389,12 @@
    \conn{#1}{#2}{#3}{IS_CONN}{#4}
 }
 
-
 \newcommand{\configMap}[4] {% {Id}{Size}{Location}{Label}
   \initVars{configMap}{#1}{#2}{#3}
   
   \pgfmathsetmacro\scale{\configMapSize * 1.3}
+  % TODO Find size mapping scheme of icons and remove magic number
+  \pgfmathsetmacro\wrenchSize{2.5 + \configMapSize * 0.75}
   \definecolor{blueprint}{RGB}{4,63,140}
 
    \node[ configMapLocation,
@@ -322,12 +409,12 @@
         ] (\configMapId) {};
         
   %\draw (0,0) node (wrench) [yscale=\scale,xscale=\scale, thick, cmLocation ] {\bcoutil};
-  \draw (0,0) node (wrench) [ yscale=\scale, 
-                              xscale=\scale,
-                              above = 0 cm of \configMapId.center,
-                              anchor = center, 
-                              color=white
-                            ] {\faWrench};
+  \node[ yscale=\wrenchSize, 
+         xscale=\wrenchSize,
+         above = 0 cm of \configMapId.center,
+         anchor = center, 
+         color=white
+      ] (wrench) {\faWrench};
 }
 
 \newcommand{\legend}[5] { %{Id}{Size}{Location}{Length}{LegendList}
@@ -424,6 +511,94 @@
   \tikzstyle{vari} = [minimum height = \height cm, minimum width = \width cm, diskLocation, diskColor]
   
   \node[base, vari] (\diskId) {};
+}
+
+\newcommand{\fluentd}[4] { %{Id}{Size}{Location}{label}
+  \initVars{fluentd}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\fluentdSize *0.04}
+  \pgfmathsetmacro\fluentdFontSize{\fluentdSize * 15}
+
+  \node[ fluentdLocation, 
+         minimum width=\fluentdSize cm, 
+         minimum height=\fluentdSize cm,
+         fill=blue!0,
+         circle,
+         draw=white,
+         text=white,
+         font=\fontsize{\fluentdFontSize}{0}\selectfont,
+         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\fluentdId) {\includegraphics[width=\scale\textwidth]{fluentd.png}}; %0.05
+}
+
+\newcommand{\elasticsearch}[4] { %{Id}{Size}{Location}{label}
+  \initVars{elasticsearch}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\elasticsearchSize *0.04}
+  \pgfmathsetmacro\elasticsearchFontSize{\elasticsearchSize * 15}
+
+  \node[ elasticsearchLocation, 
+         minimum width=\elasticsearchSize cm, 
+         minimum height=\elasticsearchSize cm,
+         fill=blue!0,
+         circle,
+         draw=white,
+         text=white,
+         font=\fontsize{\elasticsearchFontSize}{0}\selectfont,
+         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\elasticsearchId) {\includegraphics[width=\scale\textwidth]{elasticsearch.png}}; %0.05
+}
+
+\newcommand{\loggingPod}[4] { %{Id}{Size}{Location}{label}
+  \initVars{loggingPod}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\loggingPodSize * 0.04}
+  \pgfmathsetmacro\loggingPodFontSize{\loggingPodSize * 15}
+
+  \node[ loggingPodLocation, 
+         minimum width=\loggingPodSize cm, 
+         minimum height=\loggingPodSize cm,
+         fill=orange!70,
+         circle,
+         draw=white,
+         text=white,
+         font=\fontsize{\loggingPodFontSize}{0}\selectfont,
+         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\loggingPodId) {\faAlignLeft}; %0.05
+}
+
+\newcommand{\loggy}[5] {% {Id}{Size}{Location}{Mouth Angle}{label}
+  \initVars{loggy}{#1}{#2}{#3}
+  \pgfmathsetmacro\loggySize{#2/2}
+  \pgfmathsetmacro\loggySiz{#2 * 0.10}
+  \tikzstyle{loggyColor}=[fill=blue!10]
+  
+  \tikzstyle{all}=[line width=0.0 mm]
+  \tikzstyle{body}= [all, rectangle, draw=blue!10, loggyColor, minimum size=#2 cm, rounded corners=0.25cm, inner sep=0mm]
+  \tikzstyle{parts}=[all, fill=white, draw=black, inner sep=0mm, minimum size = \loggySiz cm]
+  \tikzstyle{eye}=[ parts,circle]
+  
+  \node[#3] (\loggyId) {};
+  \node[body, below=0cm of \loggyId.center, anchor=center] (\loggyId body) {};
+  \node[above=0cm of \loggyId body.south, anchor=north] (\loggyId label) {#5};
+  
+  \node[circle, minimum size = \loggySize cm, above = 0 cm of \loggyId.center, anchor=center
+       ] (\loggyId core) {};
+       
+  \node[ parts,
+         semicircle,
+         minimum size = \loggySiz cm,
+         inner sep=0mm,
+         rotate=#4,
+         above = 0 cm of \loggyId.center,
+         anchor=center
+       ] (\loggyId mouth) {};
+
+  \node[ eye, 
+         below = 0 cm of \loggyId core.125, 
+         anchor=center
+       ] (\loggyId left_eye) {};
+  \node[ eye,
+         below = 0 cm of \loggyId core.55, 
+         anchor=center
+       ] (\loggyId right_eye) {};
 }
 
 \newcommand{\cube}[4] {% {Id}{Size}{Location}{color}

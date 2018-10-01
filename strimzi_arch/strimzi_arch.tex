@@ -5,12 +5,10 @@
 %
 % TODO:
 %   - Refactor 
-%   - Cleanup/Abstract Kafka Brokers
-%   - Cleanup/Abstract CRDs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[ tikz,
                 border=5mm,
-                %convert={outfile=strimzi_arch.svg}
+                convert={outfile=strimzi_arch.svg}
                ]{standalone}
 
 \input{../functions/functions.tex}
@@ -21,6 +19,7 @@
   \pgfmathsetmacro\diagramSize{.8}
   \pgfmathsetmacro\fontSize{\diagramSize * 5}
   \pgfmathsetmacro\fontSep{\diagramSize * 3}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
   
   \pgfmathsetmacro\midCircle{10}
   \pgfmathsetmacro\innerCircle{\midCircle * 0.65}

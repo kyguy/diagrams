@@ -1,0 +1,45 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILE: strimzi_conn.tex
+% DESC: Displays supported connection types between 
+%       different Strimzi components
+%
+% TODO:
+%   - Refactor 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[ tikz,
+                border=5mm,
+                %convert={outfile=strimzi_arch.svg}
+               ]{standalone}
+
+\input{../functions/functions.tex}
+
+%\iffalse
+%\fi
+\begin{document}
+
+\newcommand{\layout}[3] {% {Id}{Size}{Location}
+  \pgfmathsetmacro\layoutScale{#2}
+  \pgfmathsetmacro\layoutSizeInner{#2}
+  \pgfmathsetmacro\layoutSizeOuter{#2 + \layoutScale}
+  \pgfmathsetmacro\layoutSizeFrame{#2 + \layoutScale*2}
+  
+  \def\layerList{layoutInner/\layoutSizeInner,
+                 layoutOuter/\layoutSizeOuter,
+                 layoutFrame/\layoutSizeFrame
+                 }
+                 
+  \foreach \n/\s in \layerList {
+    \node[circle, minimum size=\s cm, draw, dotted, opacity=0.5] (\n) {};
+  }
+}
+
+\begin{tikzpicture}
+  \layout{L0}{1}{}
+  \pgfmathsetmacro\fontSize{1.1}
+  \pgfmathsetmacro\fontSep{0.01}
+  \tikzset{font=\fontsize{2}{2.4}\selectfont}
+  \hardware{h0}{0.4}{}
+  
+\end{tikzpicture}
+
+\end{document}
