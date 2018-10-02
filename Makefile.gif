@@ -1,0 +1,8 @@
+all: generate clean
+
+generate:
+	pdflatex -shell-escape $(PROJECT_NAME).tex
+	convert -density 300 -delay 15 -loop 0 -background white -alpha remove ${PROJECT_NAME}.pdf ${PROJECT_NAME}.gif
+
+clean:
+	-rm ./*{aux,fdb_latexmk,fls,log,synctex.gz,~} 2> /dev/null

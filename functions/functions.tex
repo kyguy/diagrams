@@ -10,6 +10,7 @@
 %   - Automatic Legend Layout
 %       * Calc page length, node length, array length 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{import}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
@@ -527,7 +528,7 @@
          text=white,
          font=\fontsize{\fluentdFontSize}{0}\selectfont,
          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
-       ] (\fluentdId) {\includegraphics[width=\scale\textwidth]{fluentd.png}}; %0.05
+       ] (\fluentdId) {\includegraphics[width=\scale\textwidth]{../images/fluentd.png}};
 }
 
 \newcommand{\elasticsearch}[4] { %{Id}{Size}{Location}{label}
@@ -544,7 +545,8 @@
          text=white,
          font=\fontsize{\elasticsearchFontSize}{0}\selectfont,
          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
-       ] (\elasticsearchId) {\includegraphics[width=\scale\textwidth]{elasticsearch.png}}; %0.05
+       ] (\elasticsearchId) { \includegraphics[ width=\scale\textwidth]
+                                         {../images/elasticsearch.png}};
 }
 
 \newcommand{\loggingPod}[4] { %{Id}{Size}{Location}{label}
