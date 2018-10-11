@@ -23,32 +23,32 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LOGGY
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %\loggy{loggy}{0.9}{above right = 0.5 cm and 1.65cm of OUTERRECTANGLE.north west}{180}{Loggy}
+  \loggy{loggy}{0.9}{above right = 0.5 cm and 1.65cm of OUTERRECTANGLE.north west}{180}{Loggy}
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LOGGY ROUTE
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %\pgfmathsetmacro\connThickness{\diagramSize * 2}
+  \pgfmathsetmacro\connThickness{\diagramSize * 2}
 
   
-  %\tikzstyle{S_CONN}  = [SECURE_CONN, line width=\connThickness mm, color=red!60]
+  \tikzstyle{S_CONN}  = [SECURE_CONN, line width=\connThickness mm, color=red!60]
   
-  %\path[S_CONN]  
-  %(lp0.south) edge (flu0)
-  %(flu0.east) edge (kcp0)
-  %(flu0.east) edge (kcp0)
-  %(kcp0) edge (kp2)
+  \path[S_CONN]  
+  (lp0.south) edge (flu0)
+  (flu0.east) edge (kcp0)
+  (flu0.east) edge (kcp0)
+  (kcp0) edge (kp2)
   
-  %(kcp1.east) edge (els0.west)
-  %(kp2) edge (kcp1)
-  %;
+  (kcp1.east) edge (els0.west)
+  (kp2) edge (kcp1)
+  ;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LABELS
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %\node[above= 0cm of OUTERRECTANGLE.40, anchor=center] () {\textbf{\Large Map of Loggy's Journey}};
-  %\node[above= 0.95cm of hw10_openshift.mid, anchor=center] () {\textbf{\Large START}};
-  %\node[below= 1.75cm of hw9_openshift.mid, anchor=center] () {\textbf{\Large FINISH}};
+  \node[above= 0cm of OUTERRECTANGLE.40, anchor=center] () {\textbf{\Large Map of Loggy's Journey}};
+  \node[above= 0.95cm of hw10_openshift.mid, anchor=center] () {\textbf{\Large START}};
+  \node[below= 1.75cm of hw9_openshift.mid, anchor=center] () {\textbf{\Large FINISH}};
  
 \end{tikzpicture}
 
