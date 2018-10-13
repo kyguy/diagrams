@@ -31,8 +31,13 @@
   
 \definecolor{ClusterOperatorColor}{RGB}{0,127,189}  
 \definecolor{TopicOperatorColor}{RGB}{0,51,71}
-\definecolor{ZookeeperColor}{RGB}{11,102,35}
+\definecolor{StrimziColor}{RGB}{0,51,71}
+\definecolor{ZookeeperColor}{RGB}{106,145,81}
 \definecolor{HardwareColor}{RGB}{0,0,51}
+\definecolor{FluentdColor}{RGB}{123,189,227}
+\definecolor{ElasticsearchColor}{RGB}{2,189,176}
+\definecolor{KafkaColor}{RGB}{252,200,13}
+
 
 \tikzstyle{SECURE_CONN} =  [color=gray!60, thick, dashed, draw]
 \tikzstyle{INSECURE_CONN} = [color=red!60, thick, dashdotted, draw] 
@@ -46,6 +51,23 @@
     \@ifundefined{pgf@sh@ns@#1}{#3}{#2}%
 }
 \makeatother
+
+% Fields
+\pgfmathsetmacro\colorIntensity{99}
+
+\newcommand{\outline}[5] {% {Id}{Size}{Location}{outline}{opts}
+  % Takes a list of outline shapes and sizes and draws them
+  \initVars{outline}{#1}{#2}{#3}
+  \foreach \shape/\height/\width/\id in #4 {
+    \node[ \shape, 
+           minimum size=\height cm,
+           minimum height=\height cm, 
+           minimum width=\width cm, #5,
+           #3, 
+           dotted
+         ] (\id) {};
+  }
+}
 
 % Establishes consistent variable scheme by prepending all
 % variables with command name
@@ -90,8 +112,8 @@
 \newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{label}
   \initVars{kafkaPod}{#1}{#2}{#3}
   \tikzstyle{kafkaPodColor} = [fill=yellow]     % #4 = color
-    
-  \pgfmathsetmacro\kafkaPodSize{\kafkaPodSize} 
+  \pgfmathsetmacro\kafkaPodLabelDist{\kafkaPodSize*-0.20}
+
    % Can't pass \kafkaPodLocation 
   \kafka{\kafkaPodId_0}{\kafkaPodSize}{#3}{#4}
   \pgfmathsetmacro\kafkaPodSep{- \kafkaPodSize * 2.5} 
@@ -102,10 +124,10 @@
            inner sep = \kafkaPodSep mm,
            minimum size = \kafkaPodSize cm,
            color=black, 
-           kafkaPodColor,
+           fill=KafkaColor!\colorIntensity,
            draw=white,
            fit=(\kafkaPodId_0),
-           label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+           label={[label distance=\kafkaPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
          ] (\kafkaPodId) {};
   \end{pgfonlayer}
 }
@@ -163,8 +185,8 @@
 %\definecolor{mycolor}{RGB}{255,51,76}
 \newcommand{\kafkaConnectPod}[4]{% {Id}{Size}{Location}{label}
   \initVars{kafkaConnectPod}{#1}{#2}{#3}
-  \tikzstyle{kafkaConnectPodColor} = [fill=kafkaConnectPod] % #4 = color
-    
+  \pgfmathsetmacro\kcPodLabelDist{\kafkaConnectPodSize*-0.20}
+  
   \pgfmathsetmacro\kafkaConnectPodSize{\kafkaConnectPodSize} 
    % Can't pass \kafkaPodLocation 
   \kafkaConnect{\kafkaConnectPodId_0}{\kafkaConnectPodSize}{#3}{#4}
@@ -175,10 +197,10 @@
            inner sep = \kafkaConnectPodSep mm,
            minimum size = \kafkaConnectPodSize cm,
            color=black, 
-           kafkaConnectPodColor,
+           fill=kafkaConnectPod!\colorIntensity,
            draw=white,
            fit=(\kafkaConnectPodId_0),
-           label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+           label={[label distance=\kcPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
          ] (\kafkaConnectPodId) {};
   \end{pgfonlayer}
 }
@@ -206,6 +228,28 @@
          minimum size= \ppodSize cm, 
          draw, 
          podColor, 
+         fit=(\podId_center)
+       ] (\podId) {};
+  
+}
+
+\newcommand{\podd}[4] {% {Id}{Size}{Location}{color}
+  \initVars{pod}{#1}{#2}{#3}
+  \tikzstyle{podColor} = [#4] % #4 = color
+  
+  \pgfmathsetmacro\conSize{\podSize*0.27}
+
+  \tikzstyle{base} = [rectangle, inner sep = 0 mm, rectangle, fill=purple]
+  \tikzstyle{vari} = [minimum height = \conSize cm, minimum width = \conSize cm, podLocation]
+      
+  \node[base, vari] (\podId_center) {};
+  
+  \node[ circle, 
+         thick, 
+         inner sep = 0 mm, 
+         minimum size= \podSize cm, 
+         fill=red!10,
+         opacity=.65, 
          fit=(\podId_center)
        ] (\podId) {};
   
@@ -323,7 +367,6 @@
 
 \newcommand{\hardware}[3] {% {Id}{Size}{Location}
   \initVars{hardware}{#1}{#2}{#3}
-  
   \pgfmathsetmacro\width{\hardwareSize*2.0}
   \pgfmathsetmacro\height{\hardwareSize*0.5}
   \pgfmathsetmacro\osHeight{\height*3}
@@ -332,8 +375,7 @@
   \tikzstyle{base} = [rectangle, rounded corners, minimum height = \height cm, minimum width = \width cm] 
   
   \node[hardwareLocation] (\hardwareId) {};
-  %\node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {\tiny Node};
-   \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {Node};
+  \node[base, fill=black!80, text=white, below = \nodeDis cm of \hardwareId] (\hardwareId_Node) {Node};
    
   \begin{pgfonlayer}{background}
     \node [ base, 
@@ -353,19 +395,23 @@
 
 \newcommand{\zookeeper}[4] { %{Id}{Size}{Location}{label}
   \initVars{zookeeper}{#1}{#2}{#3}
-  \pgfmathsetmacro\scale{\zookeeperSize}
-  \pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
-
-  \node[ zookeeperLocation, 
-         minimum width=\zookeeperSize cm, 
-         minimum height=\zookeeperSize cm,
-         fill=ZookeeperColor,
-         circle,
+  \pgfmathsetmacro\scale{\zookeeperSize * 0.04}
+  \pgfmathsetmacro\ZookeeperLabelDist{\zookeeperSize * -0.20}
+  %\pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
+  %font=\fontsize{\zookeeperFontSize}{0}\selectfont,
+  \node[ circle,
+         zookeeperLocation,
+         inner sep = 0 mm,
+         minimum size=\zookeeperSize cm, 
+         fill=ZookeeperColor!\colorIntensity,
          draw=white,
          text=white,
-         font=\fontsize{\zookeeperFontSize}{0}\selectfont,
-         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
-       ] (\zookeeperId) {Z};
+         label={[label distance=\ZookeeperLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\zookeeperId) {};
+
+  \node[ above = 0cm of \zookeeperId.center, anchor=center
+       ] () { \includegraphics[ width=\scale\textwidth]
+                                         {../images/zookeeper.png}};
 }
 
 \newcommand{\conn}[5] { %{Id}{Size}{Location}{Conn Type}{label}
@@ -517,36 +563,56 @@
 \newcommand{\fluentd}[4] { %{Id}{Size}{Location}{label}
   \initVars{fluentd}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\fluentdSize *0.04}
-  \pgfmathsetmacro\fluentdFontSize{\fluentdSize * 15}
-
-  \node[ fluentdLocation, 
-         minimum width=\fluentdSize cm, 
-         minimum height=\fluentdSize cm,
-         fill=blue!0,
-         circle,
+  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * -0.20}
+  \node[ circle, 
+         fluentdLocation,
+         inner sep = 0 mm,
+         minimum size=\fluentdSize cm,
+         fill=FluentdColor!\colorIntensity,
          draw=white,
-         text=white,
-         font=\fontsize{\fluentdFontSize}{0}\selectfont,
-         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
-       ] (\fluentdId) {\includegraphics[width=\scale\textwidth]{../images/fluentd.png}};
+         label={[label distance=\fluentdLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\fluentdId) {};
+
+  \node[ above = 0 cm of \fluentdId.center, anchor=center       
+       ] () {\includegraphics[width=\scale\textwidth]{../images/fluentd.png}};
 }
 
 \newcommand{\elasticsearch}[4] { %{Id}{Size}{Location}{label}
   \initVars{elasticsearch}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\elasticsearchSize *0.04}
-  \pgfmathsetmacro\elasticsearchFontSize{\elasticsearchSize * 15}
+  \pgfmathsetmacro\esLabelDist{\elasticsearchSize * -0.20}
 
-  \node[ elasticsearchLocation, 
-         minimum width=\elasticsearchSize cm, 
-         minimum height=\elasticsearchSize cm,
-         fill=blue!0,
-         circle,
+  \node[ circle, 
+         elasticsearchLocation,
+         inner sep = 0 mm,
+         minimum size=\elasticsearchSize cm, 
+         fill=ElasticsearchColor!\colorIntensity,
          draw=white,
-         text=white,
-         font=\fontsize{\elasticsearchFontSize}{0}\selectfont,
-         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
-       ] (\elasticsearchId) { \includegraphics[ width=\scale\textwidth]
+         label={[label distance=\esLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\elasticsearchId) {};
+       
+  \node[ above = 0 cm of \elasticsearchId.center, anchor=center 
+       ] () { \includegraphics[ width=\scale\textwidth]
                                          {../images/elasticsearch.png}};
+}
+
+\newcommand{\strimzi}[4] { %{Id}{Size}{Location}{label}
+  \initVars{strimzi}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\strimziSize *0.04}
+  \pgfmathsetmacro\strimziLabelDist{\strimziSize * -0.20}
+
+  \node[ circle, 
+         strimziLocation,
+         inner sep = 0 mm,
+         minimum size=\strimziSize cm, 
+         fill=StrimziColor!\colorIntensity,
+         draw=white,
+         label={[label distance=\strimziLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\strimziId) {};
+       
+  \node[ above = 0 cm of \strimziId.center, anchor=center 
+       ] () { \includegraphics[ width=\scale\textwidth]
+                                         {../images/strimzi.png}};
 }
 
 \newcommand{\loggingPod}[4] { %{Id}{Size}{Location}{label}
@@ -571,9 +637,11 @@
   \pgfmathsetmacro\loggySize{#2/2}
   \pgfmathsetmacro\loggySiz{#2 * 0.10}
   \tikzstyle{loggyColor}=[fill=blue!10]
+  \pgfmathsetmacro\loggyCoreSize{\loggySize * 0.90}
+  \pgfmathsetmacro\loggyCornerSize{\loggySize * 0.25}
   
   \tikzstyle{all}=[line width=0.0 mm]
-  \tikzstyle{body}= [all, rectangle, draw=blue!10, loggyColor, minimum size=#2 cm, rounded corners=0.25cm, inner sep=0mm]
+  \tikzstyle{body}= [all, rectangle, draw=blue!10, loggyColor, minimum size=#2 cm, rounded corners=\loggyCornerSize cm, inner sep=0mm]
   \tikzstyle{parts}=[all, fill=white, draw=black, inner sep=0mm, minimum size = \loggySiz cm]
   \tikzstyle{eye}=[ parts,circle]
   
@@ -581,7 +649,11 @@
   \node[body, below=0cm of \loggyId.center, anchor=center] (\loggyId body) {};
   \node[above=0cm of \loggyId body.south, anchor=north] (\loggyId label) {#5};
   
-  \node[circle, minimum size = \loggySize cm, above = 0 cm of \loggyId.center, anchor=center
+  \node[ circle, 
+         %draw,
+         inner sep = 0 mm,
+         minimum size = \loggyCoreSize cm, 
+         above = 0 cm of \loggyId.center, anchor=center
        ] (\loggyId core) {};
        
   \node[ parts,

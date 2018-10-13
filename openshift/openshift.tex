@@ -1,7 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FILE: strimzi_conn.tex
-% DESC: Displays supported connection types between 
-%       different Strimzi components
+% FILE: openshift.tex
+% DESC: 
 %
 % TODO:
 %   - Refactor 
@@ -15,26 +14,150 @@
 
 %\iffalse
 %\fi
-\begin{document}
 
-\newcommand{\layout}[3] {% {Id}{Size}{Location}
-  \pgfmathsetmacro\layoutScale{#2}
-  \pgfmathsetmacro\layoutSizeInner{#2}
-  \pgfmathsetmacro\layoutSizeOuter{#2 + \layoutScale}
-  \pgfmathsetmacro\layoutSizeFrame{#2 + \layoutScale*2}
+\newcommand{\container}[3] {% {Id}{Size}{Location}
+  \initVars{container}{#1}{#2}{#3}
+  \pgfmathsetmacro\containerCorners{\containerSize*0.5}
   
-  \def\layerList{layoutInner/\layoutSizeInner,
-                 layoutOuter/\layoutSizeOuter,
-                 layoutFrame/\layoutSizeFrame
-                 }
-                 
-  \foreach \n/\s in \layerList {
-    \node[circle, minimum size=\s cm, draw, dotted, opacity=0.5] (\n) {};
-  }
+  \tikzstyle{containerStyle} = 
+  [ 
+    rectangle,
+    rounded corners = \containerCorners mm, 
+    inner sep=0mm,
+    thick, 
+    fill=purple,
+    minimum height = #2 cm,
+    minimum width = #2 cm
+  ]
+  % Takes a list of outline shapes and sizes and draws them
+  %\foreach \shape/\height/\width/\id in \outlineList {
+  % }
+  \node[containerStyle, #3] (\containerId) {};
 }
 
+\newcommand{\containerEngine}[3] {% {Id}{Size}{Location}
+  \initVars{containerEngine}{#1}{#2}{#3}
+  \pgfmathsetmacro\containerEngineCorners{\containerEngineSize*1.15}
+  \pgfmathsetmacro\containerEngineWidth{\containerEngineSize* 2.5}
+  \pgfmathsetmacro\containerEngineLabel{\containerEngineSize* 0.20}
+  
+  \tikzstyle{containerEngineStyle} = 
+  [ 
+    rectangle,
+    rounded corners = \containerEngineCorners mm, 
+    inner sep=0mm,
+    thick, 
+    fill=blue!50,
+    minimum height = #2 cm,
+    minimum width = \containerEngineWidth cm
+  ]
+  % Takes a list of outline shapes and sizes and draws them
+  %\foreach \shape/\height/\width/\id in \outlineList {
+  % }
+  \node[containerEngineStyle, #3] (\containerEngineId) {};
+  \node[ text=white, 
+         above = \containerEngineLabel cm of \containerEngineId.south, 
+         anchor = center
+       ] () {Container Engine};
+}
+
+\begin{document}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % SIZING
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \pgfmathsetmacro\diagramSize{1.0}
+  \pgfmathsetmacro\hwSize{\diagramSize * 1.20}
+  \pgfmathsetmacro\poSize{\diagramSize * 0.5} % pod
+  \pgfmathsetmacro\ceSize{\diagramSize * 0.55} % container engine
+  \pgfmathsetmacro\coSize{\poSize * 0.27} % container
+  \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
+
+  \pgfmathsetmacro\fontSize{\diagramSize * 3}
+  \pgfmathsetmacro\fontSep{\diagramSize *  2}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
+  
+  \pgfmathsetmacro\nodeSize{1.0}
+
+  % Circle Outlines
+  \pgfmathsetmacro\outlineSize{4.5}
+  \pgfmathsetmacro\innerCircle{\outlineSize * 0.37}
+  \pgfmathsetmacro\leftCircle{\outlineSize * 0.23}
+  
+  % Rectangle Outlines
+  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 0.8}
+  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 0.75}
+  \pgfmathsetmacro\centerRectangleHeight{\outlineSize * 0.37}
+  \pgfmathsetmacro\centerRectangleWidth{\outlineSize * 0.75}
+  \pgfmathsetmacro\midRectangleHeight{\outlineSize * 1.5}
+  \pgfmathsetmacro\rightRectangleHeight{\outlineSize * 0.25}
+  \pgfmathsetmacro\rightRectangleWidth{\outlineSize * 0.15}
+  
+                
 \begin{tikzpicture}
-  \layout{L0}{1}{}
+
+   \outline{o0}{}{}{{
+     circle/\innerCircle/\innerCircle/INNERCIRCLE,
+     rectangle/\innerRectangleHeight/\innerRectangleWidth/INNERRECTANGLE/,
+     rectangle/\centerRectangleHeight/\centerRectangleWidth/CENTERRECTANGLE/
+     %rectangle/\midRectangleHeight/\midRectangleHeight/MIDRECTANGLE/
+    }}{}
+   
+   \outline{o2}{}{above=0 cm of CENTERRECTANGLE.north east, anchor=center}{{
+     rectangle/\rightRectangleHeight/\rightRectangleWidth/RIGHTRECTANGLE/
+   }}{}
+   
+   \outline{o2}{}{above=0 cm of INNERRECTANGLE.north west, anchor=center}{{
+     circle/\leftCircle/\leftCircle/LEFTCIRCLE/
+   }}{draw}
+   
+   
+   \hardware{hw0}{\hwSize}{}
+   
+   \containerEngine{ce}{\ceSize}{above = 0.6 cm of hw0_openshift.south, anchor=center}
+   \container{c0}{\coSize}{above = 0 cm of ce.center, anchor=center}
+   \container{c1}{\coSize}{left= \coSepSize cm of c0.center}
+   \container{c2}{\coSize}{right= \coSepSize cm of c0.center}
+   \container{c3}{\coSize}{right= \coSepSize cm of c2.center}
+   \container{c4}{\coSize}{left= \coSepSize cm of c1.center}
+  
+   \node[above= 0cm of c0.north, text=white, anchor=south, inner sep=0mm ] () {Containers};
+   %\path[->, to path={-| (\tikztotarget)}]
+   %  (C_LABEL_\id.west) edge (C0_\id.north)
+   %  (C_LABEL_\id.east) edge (C7_\id.north);
+   
+   \podd{p0}{\poSize}{above = 0 cm of CENTERRECTANGLE.north, anchor=center }{}
+   \node[text=white, above = 0cm of p0.north, anchor=south, inner sep =0 mm] {Pod};     
+   \draw [line width=0.1 mm, dotted] 
+     (p0_center.north) edge (LEFTCIRCLE.30)
+     (p0_center.south) edge (LEFTCIRCLE.south)
+   ;
+    \draw [->, inner sep=0 mm] 
+     (c0) edge (p0_center.south)
+   ; 
+   
+   \loggy{l0}{\poSize}{above = 0 cm of LEFTCIRCLE.center, anchor=center, inner sep = 0 mm}{180}{}
+   
+   \strimzi{s0}{\poSize}{above = 0 cm of INNERRECTANGLE.47, anchor=center}{Strimzi pod}
+   \fluentd{f0}{\poSize}{above = 0 cm of INNERRECTANGLE.37, anchor=center}{Fluentd pod}
+   \kafkaPod{k0}{\poSize}{above = 0 cm of INNERRECTANGLE.23, anchor=center}{Kafka pod}
+   \kafkaConnectPod{c0}{\poSize}{above = 0 cm of INNERRECTANGLE.06,  anchor=center}{Kafka Connect pod}
+   \elasticsearch{e0}{\poSize}{above = 0 cm of INNERRECTANGLE.348, anchor=center}{Elasticsearch pod}
+   \zookeeper{z0}{\poSize}{above = 0 cm of INNERRECTANGLE.332, anchor=center}{Zookeeper pod}
+   
+   \draw [text=white,] 
+     (p0.east) -- node[above] {could be} ++ (RIGHTRECTANGLE)
+   ;
+   %line width=0.01 mm
+   \draw [-, to path={|- (\tikztotarget)}] 
+    (RIGHTRECTANGLE.west) edge (s0.west)
+    (RIGHTRECTANGLE.west) edge (f0.west)
+    (RIGHTRECTANGLE.west) edge (k0.west)
+    (RIGHTRECTANGLE.west) edge (c0.west)
+    (RIGHTRECTANGLE.west) edge (e0.west)
+    (RIGHTRECTANGLE.west) edge (z0.west)
+   ;
+   
+   
 \end{tikzpicture}
 
 \end{document}

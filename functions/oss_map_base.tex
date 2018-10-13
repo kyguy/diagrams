@@ -7,18 +7,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{functions.tex}
 
-\newcommand{\outline}[4] {% {Id}{Size}{Location}{outline}{draw}
-  % Takes a list of outline shapes and sizes and draws them
-  \foreach \shape/\height/\width/\id in \outlineList {
-    \node[ \shape, 
-           minimum size=\height cm,
-           minimum height=\height cm, 
-           minimum width=\width cm, %draw, 
-           dotted
-         ] (\id) {};
-  }
-}
-
 \newcommand{\ossMap}[1] {
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % SIZING
@@ -53,21 +41,21 @@
   \def\ssLineWidth{1.0mm}
   \tikzstyle{ssStyle} = [thick, green, -]
   
-  \def\outlineList{ circle/\innerCircle/\innerCircle/INNERCIRCLE,
-                    circle/\midCircle/\midCircle/CENTER,
-                    circle/\outerCircle/\outerCircle/OUTERCIRCLE,
-                    rectangle/\innerRectangleHeight/\innerRectangleWidth/INNERRECTANGLE, 
-                    rectangle/\midRectangleHeight/\midRectangleWidth/MIDRECTANGLE,
-                    rectangle/\outerRectangleHeight/\outerRectangleWidth/OUTERRECTANGLE,
-                    rectangle/\outerRectangleHeight/\outerRectangleWidth/OUTERRECTANGLE
+  \def\outlineList{ circle/\innerCircle/\innerCircle/INNERCIRCLE/,
+                    circle/\midCircle/\midCircle/CENTER/,
+                    circle/\outerCircle/\outerCircle/OUTERCIRCLE/,
+                    rectangle/\innerRectangleHeight/\innerRectangleWidth/INNERRECTANGLE/, 
+                    rectangle/\midRectangleHeight/\midRectangleWidth/MIDRECTANGLE/,
+                    rectangle/\outerRectangleHeight/\outerRectangleWidth/OUTERRECTANGLE/,
+                    rectangle/\outerRectangleHeight/\outerRectangleWidth/OUTERRECTANGLE/
                  }
                  
-  \outline{}{}{}{\outlineList}
+  \outline{}{}{}{\outlineList}{}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % STRIMZI OPERATOR
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \hardware{hw000}{1.0}{above = 0cm of CENTER.center, anchor=center}
-  \clusterOperator{co0}{\diagramSize}{above = 0.0cm of hw000_openshift.mid, anchor=center}{}
+  \strimzi{co0}{\diagramSize}{above = 0.0cm of hw000_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % KAFKA CLUSTER
