@@ -15,39 +15,6 @@
 %\iffalse
 %\fi
 
-\newcommand{\partition}[5] {% {Id}{Size}{Location}{num of records}{color}
-  \initVars{partition}{#1}{#2}{#3}
-
-  \tikzstyle{record}=[rectangle, minimum size=\recordSize cm, draw, #5]
-  
-  \node[#3] (\partitionId) {};
-  \pgfmathsetmacro\recordPos{0}
-  
-  \foreach \record in {1,...,#4} {
-    \node[ record,
-           right = \recordPos cm of \partitionId,
-           anchor=west
-         ] (\partitionId_r\record) {};
-         
-    \pgfmathparse{\recordPos + \recordSize}
-    \global\let\recordPos=\pgfmathresult
-  }
-}
-
-\newcommand{\broker}[4] {% {Id}{Size}{Location}{partitions}
-  \initVars{broker}{#1}{#2}{#3}
-  
-  \node[#3] (\brokerId) {};
-  \pgfmathtruncatemacro\pos{0} 
-  
-  \foreach \id/\r/\c in #4 {
-    \partition{\brokerId_\id}{\recordSize}{below = \pos cm of \brokerId, anchor=north}{\r}{\c}  
-    \pgfmathparse{(\pos + (2.00 * \recordSize) }
-    \global\let\pos=\pgfmathresult
-  }
-  
-}
-
 \begin{document}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % SIZING
@@ -112,7 +79,7 @@
    %\partition{p0}{\segmentSize}{}{3}{fill=purple!50}
    \tikzstyle{topicLeaderColor} = [fill=red!50]
    \tikzstyle{topicFollowerColor} = [fill=red!10]
-   \broker{b0}{\segmentSize}{below = 0.1cm of ALIGNRECTANGLE.north west, anchor=north}{ 
+   \broker{b0}{\recordSize}{below = 0.1cm of ALIGNRECTANGLE.north west, anchor=north}{ 
        {  
          par0/5/topicLeaderColor/,
          par1/2/topicFollowerColor/,

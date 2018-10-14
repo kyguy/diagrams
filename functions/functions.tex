@@ -16,6 +16,7 @@
 \usepackage{lmodern}
 \usepackage{tikz}
 \usepackage{ifthen}
+\usepackage{listings}
 \usetikzlibrary{intersections}
 \usetikzlibrary{positioning}
 \usetikzlibrary{fit}
@@ -37,8 +38,8 @@
 \definecolor{FluentdColor}{RGB}{123,189,227}
 \definecolor{ElasticsearchColor}{RGB}{2,189,176}
 \definecolor{KafkaColor}{RGB}{252,200,13}
-
-
+\definecolor{CustomResourceColor}{RGB}{4,63,140}
+  
 \tikzstyle{SECURE_CONN} =  [color=gray!60, thick, dashed, draw]
 \tikzstyle{INSECURE_CONN} = [color=red!60, thick, dashdotted, draw] 
 
@@ -54,6 +55,7 @@
 
 % Fields
 \pgfmathsetmacro\colorIntensity{99}
+\pgfmathsetmacro\LabelDist{-0.10}
 
 \newcommand{\outline}[5] {% {Id}{Size}{Location}{outline}{opts}
   % Takes a list of outline shapes and sizes and draws them
@@ -112,7 +114,7 @@
 \newcommand{\kafkaPod}[4]{% {Id}{Size}{Location}{label}
   \initVars{kafkaPod}{#1}{#2}{#3}
   \tikzstyle{kafkaPodColor} = [fill=yellow]     % #4 = color
-  \pgfmathsetmacro\kafkaPodLabelDist{\kafkaPodSize*-0.20}
+  \pgfmathsetmacro\kafkaPodLabelDist{\kafkaPodSize* \LabelDist}
 
    % Can't pass \kafkaPodLocation 
   \kafka{\kafkaPodId_0}{\kafkaPodSize}{#3}{#4}
@@ -125,6 +127,58 @@
            minimum size = \kafkaPodSize cm,
            color=black, 
            fill=KafkaColor!\colorIntensity,
+           draw=white,
+           fit=(\kafkaPodId_0),
+           label={[label distance=\kafkaPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+         ] (\kafkaPodId) {};
+  \end{pgfonlayer}
+}
+
+\newcommand{\kafkaResource}[4] {% {Id}{Size}{Location}
+  \initVars{kafka}{#1}{#2}{#3}
+  
+  \pgfmathsetmacro\msize{\kafkaSize*0.15}
+  \pgfmathsetmacro\thickness{\msize*2.0}
+  \pgfmathsetmacro\cthickness{\thickness*0.9} 
+  \pgfmathsetmacro\dis{\msize * 0.2} 
+   
+  \tikzstyle{b} = [circle, inner sep=0pt, thick, line width=\thickness mm, minimum size=\msize cm]
+  \tikzstyle{m} = [b, draw= white, fill = CustomResourceColor]
+
+  \node[ kafkaLocation,
+         minimum width=\kafkaSize cm, 
+         minimum height=\kafkaSize cm
+       ] (\kafkaId) {};
+  
+  \begin{pgfonlayer}{foreground}
+    \node[m, above = 0 cm of \kafkaId.center, anchor=center] (\kafkaId_M) {};
+    \node[m, above = \dis cm of \kafkaId_M] (\kafkaId_m0) {};
+    \node[m, above right = \dis cm of \kafkaId_M.15] (\kafkaId_m1) {};
+    \node[m, below right = \dis cm of \kafkaId_M.345] (\kafkaId_m2) {};
+    \node[m, below = \dis cm of \kafkaId_M] (\kafkaId_m3) {};
+    \node[b, above left = \dis cm of \kafkaId_M.165] (\kafkaId_m4) {};
+
+    \foreach \x/\y in {90/0,30/1, 330/2, 270/3} {
+      \draw [line width=\cthickness mm, draw= white] (\kafkaId_M.\x) edge (\kafkaId_m\y);
+    }
+  \end{pgfonlayer}
+  %\node[fit=(\kafkaId_M)(\kafkaId_m0)(\kafkaId_m1)(\kafkaId_m2)(\kafkaId_m3)(\kafkaId_m4)] (\kafkaId) {};
+}
+\newcommand{\kafkaPodResource}[4]{% {Id}{Size}{Location}{label}
+  \initVars{kafkaPod}{#1}{#2}{#3}
+  \tikzstyle{kafkaPodColor} = [fill=CustomResourceColor]     % #4 = color
+  \pgfmathsetmacro\kafkaPodLabelDist{\kafkaPodSize*\LabelDist}
+
+   % Can't pass \kafkaPodLocation 
+  \kafkaResource{\kafkaPodId_0}{\kafkaPodSize}{#3}{#4}
+  \pgfmathsetmacro\kafkaPodSep{- \kafkaPodSize * 2.5} 
+  
+  \begin{pgfonlayer}{main}
+    \node[ rectangle, 
+           inner sep = \kafkaPodSep mm,
+           minimum size = \kafkaPodSize cm,
+           color=white, 
+           fill=CustomResourceColor,
            draw=white,
            fit=(\kafkaPodId_0),
            label={[label distance=\kafkaPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
@@ -185,7 +239,7 @@
 %\definecolor{mycolor}{RGB}{255,51,76}
 \newcommand{\kafkaConnectPod}[4]{% {Id}{Size}{Location}{label}
   \initVars{kafkaConnectPod}{#1}{#2}{#3}
-  \pgfmathsetmacro\kcPodLabelDist{\kafkaConnectPodSize*-0.20}
+  \pgfmathsetmacro\kcPodLabelDist{\kafkaConnectPodSize*\LabelDist}
   
   \pgfmathsetmacro\kafkaConnectPodSize{\kafkaConnectPodSize} 
    % Can't pass \kafkaPodLocation 
@@ -300,7 +354,7 @@
 
 \newcommand{\clusterOperator}[4] {% {Id}{Size}{Location}{Label}
   \initVars{clusterOperator}{#1}{#2}{#3}
-  
+  \pgfmathsetmacro\clusterOperatorLabelDist{\clusterOperatorSize * \LabelDist}
   \pgfmathsetmacro\coSize{\clusterOperatorSize * 0.20}
   \pgfmathsetmacro\objSize{\coSize * 0.5}
   \pgfmathsetmacro\dis{\coSize * 1.5}
@@ -314,7 +368,7 @@
          draw=white, 
          fill=ClusterOperatorColor,
          clusterOperatorLocation,
-         label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+         label={[label distance=\clusterOperatorLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\clusterOperatorId) {};
   
   \tikzstyle{\clusterOperatorId Position} = [above = 0 cm of \clusterOperatorId.center, anchor=center]
@@ -330,7 +384,7 @@
 \newcommand{\topicOperator}[4] {% {Id}{Size}{Location}{label}
   \initVars{topicOperator}{#1}{#2}{#3}
   %\tikzstyle{toColor} = [#4] % #4 = color
-    
+    \pgfmathsetmacro\topicOperatorLabelDist{\topicOperatorSize * \LabelDist}
   \pgfmathsetmacro\toSize{\topicOperatorSize * 0.20}
   \pgfmathsetmacro\dis{\topicOperatorSize * 0.25 }
   \pgfmathsetmacro\scale{\toSize / 3}
@@ -345,7 +399,7 @@
           draw=white,
           fill=TopicOperatorColor,
           topicOperatorLocation,
-          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+          label={[label distance=\topicOperatorLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
         ] (\topicOperatorId) {};
   
   \tikzstyle{\topicOperatorId Position} = [above = 0 cm of \topicOperatorId.center, anchor=center]
@@ -396,7 +450,7 @@
 \newcommand{\zookeeper}[4] { %{Id}{Size}{Location}{label}
   \initVars{zookeeper}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\zookeeperSize * 0.04}
-  \pgfmathsetmacro\ZookeeperLabelDist{\zookeeperSize * -0.20}
+  \pgfmathsetmacro\ZookeeperLabelDist{\zookeeperSize * \LabelDist}
   %\pgfmathsetmacro\zookeeperFontSize{\zookeeperSize * 15}
   %font=\fontsize{\zookeeperFontSize}{0}\selectfont,
   \node[ circle,
@@ -563,7 +617,7 @@
 \newcommand{\fluentd}[4] { %{Id}{Size}{Location}{label}
   \initVars{fluentd}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\fluentdSize *0.04}
-  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * -0.20}
+  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * \LabelDist}
   \node[ circle, 
          fluentdLocation,
          inner sep = 0 mm,
@@ -580,7 +634,7 @@
 \newcommand{\fluentdStandalone}[4] { %{Id}{Size}{Location}{label}
   \initVars{fluentd}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\fluentdSize *0.04}
-  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * -0.20}
+  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * \LabelDist}
   \node[ circle, 
          fluentdLocation,
          inner sep = 0 mm,
@@ -595,7 +649,7 @@
 \newcommand{\elasticsearch}[4] { %{Id}{Size}{Location}{label}
   \initVars{elasticsearch}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\elasticsearchSize *0.04}
-  \pgfmathsetmacro\esLabelDist{\elasticsearchSize * -0.20}
+  \pgfmathsetmacro\esLabelDist{\elasticsearchSize * \LabelDist}
 
   \node[ circle, 
          elasticsearchLocation,
@@ -631,7 +685,7 @@
 \newcommand{\strimzi}[4] { %{Id}{Size}{Location}{label}
   \initVars{strimzi}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\strimziSize *0.04}
-  \pgfmathsetmacro\strimziLabelDist{\strimziSize * -0.20}
+  \pgfmathsetmacro\strimziLabelDist{\strimziSize * \LabelDist}
 
   \node[ circle, 
          strimziLocation,
@@ -723,6 +777,40 @@
          below = 0 cm of \loggyId core.55, 
          anchor=center
        ] (\loggyId right_eye) {};
+}
+
+\newcommand{\partition}[5] {% {Id}{Size}{Location}{num of records}{color}
+  \initVars{partition}{#1}{#2}{#3}
+  \pgfmathsetmacro\recordSize{\partitionSize}
+  
+  \tikzstyle{record}=[rectangle, minimum size=\recordSize cm, draw, #5]
+  
+  \node[#3] (\partitionId) {};
+  \pgfmathsetmacro\recordPos{0}
+  
+  \foreach \record in {1,...,#4} {
+    \node[ record,
+           right = \recordPos cm of \partitionId,
+           anchor=west
+         ] (\partitionId_r\record) {};
+         
+    \pgfmathparse{\recordPos + \recordSize}
+    \global\let\recordPos=\pgfmathresult
+  }
+}
+
+\newcommand{\broker}[4] {% {Id}{Size}{Location}{partitions}
+  \initVars{broker}{#1}{#2}{#3}
+  
+  \node[#3] (\brokerId) {};
+  \pgfmathtruncatemacro\brokerPos{0} 
+  
+  \foreach \id/\r/\c in #4 {
+    \partition{\brokerId_\id}{\brokerSize}{below = \brokerPos cm of \brokerId, anchor=north}{\r}{\c}  
+    \pgfmathparse{(\brokerPos + (2.00 * \brokerSize) }
+    \global\let\brokerPos=\pgfmathresult
+  }
+  
 }
 
 \newcommand{\cube}[4] {% {Id}{Size}{Location}{color}
