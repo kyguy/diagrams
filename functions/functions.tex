@@ -577,6 +577,21 @@
        ] () {\includegraphics[width=\scale\textwidth]{../images/fluentd.png}};
 }
 
+\newcommand{\fluentdStandalone}[4] { %{Id}{Size}{Location}{label}
+  \initVars{fluentd}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\fluentdSize *0.04}
+  \pgfmathsetmacro\fluentdLabelDist{\fluentdSize * -0.20}
+  \node[ circle, 
+         fluentdLocation,
+         inner sep = 0 mm,
+         minimum size=\fluentdSize cm,
+         label={[label distance=\fluentdLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\fluentdId) {};
+
+  \node[ above = 0 cm of \fluentdId.center, anchor=center       
+       ] () {\includegraphics[width=\scale\textwidth]{../images/fluentd.png}};
+}
+
 \newcommand{\elasticsearch}[4] { %{Id}{Size}{Location}{label}
   \initVars{elasticsearch}{#1}{#2}{#3}
   \pgfmathsetmacro\scale{\elasticsearchSize *0.04}
@@ -588,6 +603,23 @@
          minimum size=\elasticsearchSize cm, 
          fill=ElasticsearchColor!\colorIntensity,
          draw=white,
+         label={[label distance=\esLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+       ] (\elasticsearchId) {};
+       
+  \node[ above = 0 cm of \elasticsearchId.center, anchor=center 
+       ] () { \includegraphics[ width=\scale\textwidth]
+                                         {../images/elasticsearch.png}};
+}
+
+\newcommand{\elasticsearchStandalone}[4] { %{Id}{Size}{Location}{label}
+  \initVars{elasticsearch}{#1}{#2}{#3}
+  \pgfmathsetmacro\scale{\elasticsearchSize *0.04}
+  \pgfmathsetmacro\esLabelDist{\elasticsearchSize * -0.20}
+
+  \node[ circle, 
+         elasticsearchLocation,
+         inner sep = 0 mm,
+         minimum size=\elasticsearchSize cm, 
          label={[label distance=\esLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\elasticsearchId) {};
        
@@ -630,6 +662,24 @@
          font=\fontsize{\loggingPodFontSize}{0}\selectfont,
          label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\loggingPodId) {\faAlignLeft}; %0.05
+}
+
+
+% #1 number of teeths
+% #2 radius intern
+% #3 radius extern
+% #4 angle from start to end of the first arc
+% #5 angle to decale the second arc from the first 
+% #6 inner radius to cut off
+   
+% Credit https://tex.stackexchange.com/questions/58702/creating-gears-in-tikz
+\newcommand{\gear}[6]{%
+(0:#2)
+\foreach \i [evaluate=\i as \n using {\i-1)*360/#1}] in {1,...,#1}{%
+  arc (\n:\n+#4:#2) {[rounded corners=1.5pt] -- (\n+#4+#5:#3)
+  arc (\n+#4+#5:\n+360/#1-#5:#3)} --  (\n+360/#1:#2)
+}%
+  (0,0) circle[radius=#6]
 }
 
 \newcommand{\loggy}[5] {% {Id}{Size}{Location}{Mouth Angle}{label}
