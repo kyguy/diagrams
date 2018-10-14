@@ -248,7 +248,10 @@ spec:
          font=\fontsize{12 pt}{10 pt}\bfseries\selectfont,
        ] (Title) {\fontsize{30 pt}{5pt}\bfseries\selectfont
                   Strimzi\\Kafka Operator\\Architecture};
-
+                  
+  \node[dotted, draw,thick, fit=(coL)(toL)(kpL)(kpLl)(kcpL)(zL)(cmL)(cmLl)] (legend) {};
+  \node[above = 0cm of legend] () {Legend};
+  
 \end{tikzpicture}
 
 \end{document}

@@ -213,6 +213,7 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \node[above = 0cm of ALIGNRECTANGLE.161] () {External Data Flow};
   \tikzstyle{datum}=[rectangle, minimum size=\datumSize]
+  \pgfmathsetmacro\llSize{\datumSize*2.5}
   \node[datum, fill=red!50, right = 0.2 cm of ALIGNRECTANGLE.west] (d0) {};
   \node[datum, fill=red!50, right = 0.4 cm of ALIGNRECTANGLE.190] (d1) {};
   \node[datum, fill=red!50, right = 0.7 cm of ALIGNRECTANGLE.170] (d2) {};
@@ -228,6 +229,7 @@
   \node[datum, fill=magenta!50, right = 1.6 cm of ALIGNRECTANGLE.175] (d9) {};
   \node[datum, fill=magenta!50, right = 0.2 cm of ALIGNRECTANGLE.171] (d10) {};
   \node[datum, fill=magenta!50, right = 1.2 cm of ALIGNRECTANGLE.188] (d11) {};
+  \loggy{l0}{\llSize}{right = 1.4 cm of ALIGNRECTANGLE.180}{180}{}
   
     
 \end{tikzpicture}

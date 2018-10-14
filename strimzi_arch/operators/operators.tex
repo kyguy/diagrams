@@ -1,0 +1,90 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILE: operators.tex
+% DESC: Displays Strimzi architecture and components 
+%       overview
+%
+% TODO:
+%   - Refactor 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[ tikz,
+                border=5mm,
+                %convert={outfile=strimzi_arch.svg}
+               ]{standalone}
+\graphicspath{{../../images/}}
+\input{../../functions/functions.tex}
+%\usepackage{import}
+%\usepackage{standalone}
+
+
+%\import{../../functions/}{functions}
+
+\begin{document}
+ \pgfmathsetmacro\diagramSize{1.0}
+  \pgfmathsetmacro\fontSize{\diagramSize * 5}
+  \pgfmathsetmacro\fontSep{\diagramSize * 3}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
+  
+\begin{tikzpicture}
+  \clusterOperator{co0}{\diagramSize}{}{}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \topicOperator{to0}{\diagramSize}{}{}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \pgfmathsetmacro\frameHeight{\diagramSize*3}
+  \pgfmathsetmacro\frameWidth{\diagramSize*4.5}
+  
+  \pgfmathsetmacro\crHeight{\diagramSize*5}
+  \pgfmathsetmacro\crWidth{\diagramSize*7.4}
+
+  \outline{o0}{}{}{
+   {
+     rectangle/\frameHeight/\frameWidth/FRAME/
+   }
+  }{}
+  
+   \outline{o1}{}{above=0cm of FRAME.east, anchor=center}{
+   {
+     rectangle/\crHeight/\crWidth/CR/
+   }
+  }{draw}
+  
+  \kafkaPodResource{kr0}{\diagramSize}{above=0cm of FRAME.west, anchor=center}{}
+
+\node[above=0cm of CR.center, anchor=center] {
+\begin{lstlisting}
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: my-cluster
+spec:
+  kafka:
+    replicas: 3
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 3
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+\end{lstlisting}
+};
+
+\draw[-, dotted] 
+  (kr0) edge (CR.north west)
+  (kr0) edge (CR.south west)
+;
+\end{tikzpicture}
+
+\end{document}
