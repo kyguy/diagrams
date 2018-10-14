@@ -1,0 +1,166 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILE: kafka.tex
+% DESC: 
+%
+% TODO:
+%   - Refactor 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[ tikz,
+                border=5mm,
+                %convert={outfile=strimzi_arch.svg}
+               ]{standalone}
+
+\input{../functions/functions.tex}
+
+%\iffalse
+%\fi
+
+\newcommand{\partition}[5] {% {Id}{Size}{Location}{num of records}{color}
+  \initVars{partition}{#1}{#2}{#3}
+
+  \tikzstyle{record}=[rectangle, minimum size=\recordSize cm, draw, #5]
+  
+  \node[#3] (\partitionId) {};
+  \pgfmathsetmacro\recordPos{0}
+  
+  \foreach \record in {1,...,#4} {
+    \node[ record,
+           right = \recordPos cm of \partitionId,
+           anchor=west
+         ] (\partitionId_r\record) {};
+         
+    \pgfmathparse{\recordPos + \recordSize}
+    \global\let\recordPos=\pgfmathresult
+  }
+}
+
+\newcommand{\broker}[4] {% {Id}{Size}{Location}{partitions}
+  \initVars{broker}{#1}{#2}{#3}
+  
+  \node[#3] (\brokerId) {};
+  \pgfmathtruncatemacro\pos{0} 
+  
+  \foreach \id/\r/\c in #4 {
+    \partition{\brokerId_\id}{\recordSize}{below = \pos cm of \brokerId, anchor=north}{\r}{\c}  
+    \pgfmathparse{(\pos + (2.00 * \recordSize) }
+    \global\let\pos=\pgfmathresult
+  }
+  
+}
+
+\begin{document}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % SIZING
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \pgfmathsetmacro\diagramSize{1.0}
+  \pgfmathsetmacro\hwSize{\diagramSize * .50}
+  \pgfmathsetmacro\conSize{\diagramSize * .90}
+  \pgfmathsetmacro\datumSize{\conSize * 0.15}
+  \pgfmathsetmacro\segmentSize{\diagramSize * 0.45}
+  \pgfmathsetmacro\recordSize{\diagramSize * 0.45}
+  \pgfmathsetmacro\pluginSize{\diagramSize * 0.6} % pod
+  \pgfmathsetmacro\poSize{\diagramSize * 0.3} % pod
+  \pgfmathsetmacro\geSize{\diagramSize * 0.55} % container engine
+  \pgfmathsetmacro\geSize{\diagramSize * 0.9} % container engine
+  \pgfmathsetmacro\coSize{\poSize * 0.27} % container
+  \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
+
+  \pgfmathsetmacro\fontSize{\diagramSize * 4}
+  \pgfmathsetmacro\fontSep{\diagramSize *  3}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
+  
+  \pgfmathsetmacro\nodeSize{1.0}
+
+  % Circle Outlines
+  \pgfmathsetmacro\outlineSize{4.5}
+  \pgfmathsetmacro\frameCircle{\outlineSize * 1.02}
+
+  % Rectangle Outlines
+  \pgfmathsetmacro\frameRectangleHeight{\outlineSize * 1.50}
+  \pgfmathsetmacro\frameRectangleWidth{\outlineSize  * 1.75}
+  
+  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.25}
+  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 1.35}
+  
+  \pgfmathsetmacro\alignRectangleHeight{\outlineSize * 0.75}
+  \pgfmathsetmacro\alignRectangleWidth{\outlineSize * 0.70}
+                
+\begin{tikzpicture}
+
+   \outline{o0}{}{}{{
+     %circle/\frameCircle/\frameCircle/FRAMECIRCLE/,
+     rectangle/\alignRectangleHeight/\alignRectangleWidth/ALIGNRECTANGLE/,
+     rectangle/\innerRectangleHeight/\innerRectangleWidth/INNERRECTANGLE/
+    }}{draw}
+   
+   
+   \outline{o2}{}{}{{
+     rectangle/\frameRectangleHeight/\frameRectangleWidth/FRAMERECTANGLE/
+   }}{}
+   
+   %\outline{o2}{}{above=0 cm of INNERRECTANGLE.north west, anchor=center}{{
+   %  circle/\leftCircle/\leftCircle/LEFTCIRCLE/
+   %}}{draw}
+   
+   \hardware{hw0}{\hwSize}{above = 0 cm of FRAMERECTANGLE.west, anchor=center}
+   \kafkaPod{c0}{\poSize}{above = 0.1 cm of hw0_openshift.center, anchor=center}{}
+   
+   \draw [-, dotted] (c0)  edge  (INNERRECTANGLE.140);
+   \draw [-, dotted] (c0)  edge  (INNERRECTANGLE.220);
+   
+   
+   %\partition{p0}{\segmentSize}{}{3}{fill=purple!50}
+   \tikzstyle{topicLeaderColor} = [fill=red!50]
+   \tikzstyle{topicFollowerColor} = [fill=red!10]
+   \broker{b0}{\segmentSize}{below = 0.1cm of ALIGNRECTANGLE.north west, anchor=north}{ 
+       {  
+         par0/5/topicLeaderColor/,
+         par1/2/topicFollowerColor/,
+         par2/4/topicFollowerColor/
+     } }
+     
+  \node[above = 0.15cm of ALIGNRECTANGLE.100, anchor=center] (partition_label) {partition};
+  \draw [to path={-| (\tikztotarget)}]
+    (partition_label) edge (b0_par0_r1.120)
+    (partition_label) edge (b0_par0_r5)
+  ;
+  \node[above = 0.05cm of b0_par0_r2, anchor=south, inner sep=0mm] (seg_label) {segment};
+  \draw [to path={-| (\tikztotarget)}]
+    (seg_label) edge (b0_par0_r1)
+    (seg_label) edge (b0_par0_r3)
+  ;
+  \tikzstyle{new_record}=[rectangle, draw=red!50, thick, dotted, minimum size=\recordSize cm]
+  \node[new_record, right = 0cm of b0_par0_r5, anchor=west] (b0_par0_r6) {};
+  
+  \node[below = 0.2cm of b0_par0_r4, anchor=north] (rec_label) {record};
+  \draw [->] (rec_label) edge (b0_par0_r4);
+  
+  \node[below = 0.4cm of b0_par0_r6.south, anchor=north] (new_rec_label) {new record};
+  \draw [->] (new_rec_label) edge (b0_par0_r6);
+  
+  \node[above = 0cm of ALIGNRECTANGLE.south] () {\normalsize Kafka Broker};
+  \node[above = 0cm of INNERRECTANGLE.south, anchor=south] () {\normalsize Kafka Node};
+  
+  \tikzstyle{legend}=[rectangle,thick, minimum size=\recordSize cm]
+           ]
+  \tikzstyle{l_leader}   = [ legend, fill=red!50]
+  \tikzstyle{l_follower} = [ legend, fill=red!10]
+  \node[l_leader, right=0.2cm of INNERRECTANGLE.325,
+  label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont Leader}}
+       ] (l_leader) {};
+  \node[l_follower, below=0cm of l_leader,
+  label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont Follower}}
+  ] (l_follower) {};
+  
+  \node[above left = 0.3cm and 0.2 cm of ALIGNRECTANGLE.west, anchor=east] (topic_label) {Topic};
+  \draw [to path={|- (\tikztotarget)}]
+    (topic_label) edge (b0_par0_r1)
+    (topic_label) edge (b0_par2_r1)
+  ;
+  \draw[-] (topic_label) edge (b0_par1_r1);
+  \pgfmathsetmacro\lSize{\segmentSize * 0.5}
+  \loggy{l0}{\lSize}{above=0cm of b0_par0_r6.center, anchor=center}{180}{}
+    
+\end{tikzpicture}
+
+\end{document}

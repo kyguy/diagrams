@@ -59,7 +59,7 @@
   % Takes a list of outline shapes and sizes and draws them
   \initVars{outline}{#1}{#2}{#3}
   \foreach \shape/\height/\width/\id in #4 {
-    \node[ \shape, 
+    \node[ \shape,
            minimum size=\height cm,
            minimum height=\height cm, 
            minimum width=\width cm, #5,
