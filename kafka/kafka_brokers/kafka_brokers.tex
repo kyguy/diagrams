@@ -32,7 +32,7 @@
   \pgfmathsetmacro\coSize{\poSize * 0.27} % container
   \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
 
-  \pgfmathsetmacro\fontSize{\diagramSize * 4}
+  \pgfmathsetmacro\fontSize{\diagramSize * 5}
   \pgfmathsetmacro\fontSep{\diagramSize *  3}
   \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
   
@@ -44,7 +44,7 @@
 
   % Rectangle Outlines
   \pgfmathsetmacro\frameRectangleHeight{\outlineSize * 1.50}
-  \pgfmathsetmacro\frameRectangleWidth{\outlineSize  * 1.15}
+  \pgfmathsetmacro\frameRectangleWidth{\outlineSize  * 1.25}
   
   \pgfmathsetmacro\outerFrameRectangleHeight{\outlineSize * 1.50}
   \pgfmathsetmacro\outerFrameRectangleWidth{\outlineSize  * 2.75}
@@ -77,8 +77,8 @@
    \hardware{hw0}{\hwSize}{above = 0 cm of OUTERFRAMERECTANGLE.west, anchor=center}
    \kafkaPod{c0}{\poSize}{above = 0.1 cm of hw0_openshift.center, anchor=center}{}
    
-   \draw [-, dotted] (c0)  edge  (LEFTINNERRECTANGLE.140);
-   \draw [-, dotted] (c0)  edge  (LEFTINNERRECTANGLE.220);
+   \draw [-, dotted] (c0)  edge  (LEFTINNERRECTANGLE.130);
+   \draw [-, dotted] (c0)  edge  (LEFTINNERRECTANGLE.230);
    
    
    \hardware{hw1}{\hwSize}{above = 0 cm of OUTERFRAMERECTANGLE.east, anchor=center}
@@ -105,22 +105,22 @@
          par2/4/topicLeaderColor/
      } }
      
-  \node[above = 0.15cm of LEFTALIGNRECTANGLE.100, anchor=center] (partition_label) {partition};
+  \node[above = 0.15cm of LEFTALIGNRECTANGLE.100, anchor=center] (partition_label) {\bfseries{partition}};
   \draw [to path={-| (\tikztotarget)}]
-    (partition_label) edge (b0_par0_r1.120)
-    (partition_label) edge (b0_par0_r5)
+    (partition_label) edge (b0_par0_r1.north west)
+    (partition_label) edge (b0_par0_r5.north east)
   ;
   
-  \node[above = 0.10cm of RIGHTALIGNRECTANGLE.100, anchor=center] (partition_label2) {partition replica};
+  \node[above = 0.10cm of RIGHTALIGNRECTANGLE.100, anchor=center] (partition_label2) {\bfseries{partition replica}};
   \draw [to path={-| (\tikztotarget)}]
-    (partition_label2) edge (b1_par0_r1.120)
-    (partition_label2) edge (b1_par0_r5)
+    (partition_label2) edge (b1_par0_r1.north west)
+    (partition_label2) edge (b1_par0_r5.north east)
   ;
   
-  \node[above = 0.05cm of b0_par0_r2, anchor=south, inner sep=0mm] (seg_label) {segment};
+  \node[above = 0.05cm of b0_par0_r2, anchor=south, inner sep=0mm] (seg_label) {\bfseries{segment}};
   \draw [to path={-| (\tikztotarget)}]
-    (seg_label) edge (b0_par0_r1)
-    (seg_label) edge (b0_par0_r3)
+    (seg_label) edge (b0_par0_r1.130)
+    (seg_label) edge (b0_par0_r3.north east)
   ;
   \tikzstyle{new_record}=[rectangle, draw=red!50, thick, dotted, minimum size=\recordSize cm]
   \tikzstyle{blank_record}=[rectangle, minimum size=\recordSize cm]
@@ -129,23 +129,23 @@
   \node[new_record, right = 0cm of b1_par1_r2, anchor=west] (b1_par1_r3) {};
   \node[new_record, right = 0cm of b1_par2_r4, anchor=west] (b1_par2_r5) {};
   
-  \node[below = 0.2cm of b0_par0_r4, anchor=north] (rec_label) {record};
+  \node[below = 0.2cm of b0_par0_r4, anchor=north] (rec_label) {\bfseries{record}};
   \draw [->] (rec_label) edge (b0_par0_r4);
   
-  \node[below = 0.3cm of b0_par0_r6.south, anchor=north] (new_rec_label) {new record};
+  \node[below = 0.35cm of b0_par0_r6.south, anchor=north] (new_rec_label) {\bfseries{new record}};
   \draw [->] (new_rec_label) edge (b0_par0_r6);
   
-  \node[above = 0cm of LEFTALIGNRECTANGLE.south] () {\normalsize Kafka Broker 0 };
-  \node[above = 0cm of LEFTINNERRECTANGLE.south, anchor=south] () {\normalsize Kafka Node 0};
+  \node[above = 0cm of LEFTALIGNRECTANGLE.south] () {\bfseries{\normalsize Kafka Broker 0} };
+  \node[above = 0cm of LEFTINNERRECTANGLE.south, anchor=south] () {\bfseries{\normalsize Kafka Node 0}};
  
-  \node[above = 0cm of RIGHTALIGNRECTANGLE.south] () {\normalsize Kafka Broker 1};
-  \node[above = 0cm of RIGHTINNERRECTANGLE.south, anchor=south] () {\normalsize Kafka Node 1};
+  \node[above = 0cm of RIGHTALIGNRECTANGLE.south] () {\bfseries{\normalsize Kafka Broker 1}};
+  \node[above = 0cm of RIGHTINNERRECTANGLE.south, anchor=south] () {\bfseries{\normalsize Kafka Node 1}};
  
   \tikzstyle{legend}=[rectangle,thick, minimum size=\recordSize cm]
            ]
   \tikzstyle{l_leader}   = [ legend, fill=red!50]
   \tikzstyle{l_follower} = [ legend, fill=red!10]
-  \node[l_leader, right=0.2cm of RIGHTINNERRECTANGLE.318,
+  \node[l_leader, right=0.5cm of RIGHTINNERRECTANGLE.318,
   label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont Leader}}
        ] (l_leader) {};
   \node[l_follower, below=0cm of l_leader,
@@ -153,7 +153,7 @@
   ] (l_follower) {};
   
   
-  \node (topic_label) at ($(LEFTINNERRECTANGLE)!0.5!(RIGHTINNERRECTANGLE)$) {Topic};
+  \node (topic_label) at ($(LEFTINNERRECTANGLE)!0.5!(RIGHTINNERRECTANGLE)$) {\bfseries{Topic}};
   \draw [to path={|- (\tikztotarget)}]
    (topic_label.100) edge (b0_par0_r6)
    (topic_label.250) edge (b0_par2_r4)
@@ -166,7 +166,10 @@
   \pgfmathsetmacro\lSize{\segmentSize * 0.5}
   \loggy{l0}{\lSize}{above=0cm of b0_par0_r6.center, anchor=center}{180}{}
  
-  \draw[bend right=15, ->] (b0_par0_r6) edge (b1_par0_r6.center);
+  \def\cycleWidth{0.5mm}
+  \tikzstyle{cycleStyle} = [line width=\cycleWidth, purple, ->]
+  
+  \draw[bend left=15, ->, cycleStyle] (b0_par0_r6) edge (b1_par0_r6.center);
    
 
 \end{tikzpicture}

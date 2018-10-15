@@ -22,7 +22,7 @@
 
 \begin{tikzpicture}
   \pgfmathsetmacro\diagramSize{.8}
-  \pgfmathsetmacro\fontSize{\diagramSize * 5}
+  \pgfmathsetmacro\fontSize{\diagramSize * 11}
   \pgfmathsetmacro\fontSep{\diagramSize * 3}
   \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
   
@@ -119,7 +119,7 @@
     \pgfmathparse{\angle + \angleIncrement}
     \global\let\angle=\pgfmathresult
   }
-  \node[text=magenta!90, above = 0cm of kp3ss.north, anchor=south] () {Stateful Set};
+  \node[text=magenta!90, above = 0cm of kp3ss.north, anchor=south] () {\bfseries{Stateful Set}};
   \begin{scope}
     \pgfsetcolor{\ssColor}
     \pgfsetlinewidth{\ssLineWidth}
@@ -182,7 +182,7 @@
     } 
   }
 
-  \node[above = 0 cm of BROKERFRAME.south, anchor=south] () {\normalsize Kafka Broker};
+  \node[above = 0 cm of BROKERFRAME.south, anchor=south] () {\bfseries{\normalsize Kafka Broker}};
   \draw[-, dotted] 
   (kp3) edge (BROKERFRAME.north west)
   (kp3) edge (BROKERFRAME.south west)
@@ -202,7 +202,7 @@
     }
   }{draw}
   
-\node[below right = 0.5cm and 2cm of CRFRAME.north west, anchor=north] {
+\node[below right = 0.0cm and 2cm of CRFRAME.north west, anchor=north] {
 \begin{lstlisting}
 apiVersion: v1alpha1
 kind: Kafka
@@ -217,16 +217,19 @@ spec:
     storage:
       type: ephemeral
   zookeeper:
-    replicas: 3
-    storage:
+    replicas: 3....
+
+\end{lstlisting}
+};
+
+\iffalse 
+      storage:
       type: ephemeral
   entityOperator:
     topicOperator: {}
     userOperator: {}
+\fi
 
-\end{lstlisting}
-};
-  
 \draw[-, dotted] (kr0) edge (CRFRAME.45);
 \draw[-, dotted] (kr0) edge (CRFRAME.315);
        
@@ -250,7 +253,7 @@ spec:
                   Strimzi\\Kafka Operator\\Architecture};
                   
   \node[dotted, draw,thick, fit=(coL)(toL)(kpL)(kpLl)(kcpL)(zL)(cmL)(cmLl)] (legend) {};
-  \node[above = 0cm of legend] () {Legend};
+  \node[above = 0cm of legend] () {\bfseries{\normalsize Legend}};
   
 \end{tikzpicture}
 

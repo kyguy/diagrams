@@ -11,19 +11,21 @@
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % SIZING
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \pgfmathsetmacro\diagramSize{.8}
+  \pgfmathsetmacro\diagramSize{1.0}
+  \pgfmathsetmacro\fontSize{\diagramSize * 11}
+  \pgfmathsetmacro\fontSep{\diagramSize * 6}
+  
   \pgfmathsetmacro\diagramSizeDouble{\diagramSize * 2}
-  \pgfmathsetmacro\hardwareSize{1.0}
+  \pgfmathsetmacro\hwSize{1.2}
 
   % Circle Outlines
-  \pgfmathsetmacro\outlineSize{8.5}
+  \pgfmathsetmacro\outlineSize{10.0}
   \pgfmathsetmacro\innerCircle{\outlineSize * 0.37}
   \pgfmathsetmacro\midCircle{\outlineSize * 0.76}
   \pgfmathsetmacro\outerCircle{\outlineSize * 1.15}
   \pgfmathsetmacro\ssInner{\innerCircle / 2}
   \pgfmathsetmacro\ssOuter{\outerCircle / 2}
-  \pgfmathsetmacro\fontSize{\diagramSize * 8}
-  \pgfmathsetmacro\fontSep{\diagramSize * 5}
+
     
   % Rectangle Outlines
   \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.0}
@@ -54,7 +56,7 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % STRIMZI OPERATOR
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \hardware{hw000}{1.0}{above = 0cm of CENTER.center, anchor=center}
+  \hardware{hw000}{\hwSize}{above = 0cm of CENTER.center, anchor=center}
   \strimzi{co0}{\diagramSize}{above = 0.0cm of hw000_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -74,7 +76,7 @@
     \def\kId{kp\nodeNum}
     \def\zId{z\nodeNum}
     
-    \hardware{\hId}{1.0}{above=0cm of CENTER.\angle, anchor=center}
+    \hardware{\hId}{\hwSize}{above=0cm of CENTER.\angle, anchor=center}
     \kafkaPod{\kId}{\diagramSize}{left = 0.10cm of \hId_openshift.mid}{}
     \ifthenelse{ \nodeNum > 2}{ %\OR 
       \zookeeper{\zId}{\diagramSize}{right = 0.10cm of \hId_openshift.mid}{}
@@ -137,32 +139,33 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % KAFKA CONNECT
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \hardware{hw6}{1.0}{above = 0cm of MIDRECTANGLE.west, anchor=center}
+  \hardware{hw6}{\hwSize}{above = 0cm of MIDRECTANGLE.west, anchor=center}
   \kafkaConnectPod{kcp0}{\diagramSize}{above = 0.0cm of hw6_openshift.mid, anchor=center}{}
   
-  \hardware{hw7}{1.0}{above = 0cm of CENTER.east, anchor=center}
+  \hardware{hw7}{\hwSize}{above = 0cm of CENTER.east, anchor=center}
   \kafkaConnectPod{kcp1}{\diagramSize}{above = 0.0cm of hw7_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % FLUENTD
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \hardware{hw8}{1.0}{above = 0cm of OUTERRECTANGLE.west, anchor=center}
+  \hardware{hw8}{\hwSize}{above = 0cm of OUTERRECTANGLE.west, anchor=center}
   \fluentd{flu0}{\diagramSize}{above = 0.0cm of hw8_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ELASTICSEARCH
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \hardware{hw9}{1.0}{above = 0cm of MIDRECTANGLE.east, anchor=center}
+  \hardware{hw9}{\hwSize}{above = 0cm of MIDRECTANGLE.east, anchor=center}
   \elasticsearch{els0}{\diagramSize}{above = 0.0cm of hw9_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LOGGING APP
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \hardware{hw10}{1.0}{above = 0cm of OUTERRECTANGLE.north west, anchor=center}
+  \hardware{hw10}{\hwSize}{above = 0cm of OUTERRECTANGLE.north west, anchor=center}
   \loggingPod{lp0}{\diagramSize}{above = 0.0cm of hw10_openshift.mid, anchor=center}{}
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LABELS
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \node[above= 0cm of OUTERRECTANGLE.40, anchor=center] () {\textbf{\Large Map of Loggy's Journey}};
+  \node[below right = 0.90 and 0.15 cm of hw10.south west] () { \bfseries{(n-1)} };
 }

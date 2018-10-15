@@ -58,7 +58,7 @@
   \node[ text=white, 
          above = \containerEngineLabel cm of \containerEngineId.south, 
          anchor = center
-       ] () {Container Engine};
+       ] () {\bfseries{Container Engine}};
 }
 
 \begin{document}
@@ -66,15 +66,18 @@
   % SIZING
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \pgfmathsetmacro\diagramSize{1.0}
-  \pgfmathsetmacro\hwSize{\diagramSize * 1.20}
+  
+  \pgfmathsetmacro\fontSize{\diagramSize * 6}
+  \pgfmathsetmacro\fontSep{\diagramSize *  4}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
+  
+  
+  \pgfmathsetmacro\hwSize{\diagramSize * 1.60}
   \pgfmathsetmacro\poSize{\diagramSize * 0.5} % pod
-  \pgfmathsetmacro\ceSize{\diagramSize * 0.55} % container engine
+  \pgfmathsetmacro\ceSize{\diagramSize * 0.95} % container engine
   \pgfmathsetmacro\coSize{\poSize * 0.27} % container
   \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
 
-  \pgfmathsetmacro\fontSize{\diagramSize * 3}
-  \pgfmathsetmacro\fontSep{\diagramSize *  2}
-  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
   
   \pgfmathsetmacro\nodeSize{1.0}
 
@@ -84,13 +87,13 @@
   \pgfmathsetmacro\leftCircle{\outlineSize * 0.23}
   
   % Rectangle Outlines
-  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 0.8}
-  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 0.75}
+  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.2}
+  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 1}
   \pgfmathsetmacro\centerRectangleHeight{\outlineSize * 0.37}
-  \pgfmathsetmacro\centerRectangleWidth{\outlineSize * 0.75}
+  \pgfmathsetmacro\centerRectangleWidth{\outlineSize * 1}
   \pgfmathsetmacro\midRectangleHeight{\outlineSize * 1.5}
-  \pgfmathsetmacro\rightRectangleHeight{\outlineSize * 0.25}
-  \pgfmathsetmacro\rightRectangleWidth{\outlineSize * 0.15}
+  \pgfmathsetmacro\rightRectangleHeight{\outlineSize * 0.6}
+  \pgfmathsetmacro\rightRectangleWidth{\outlineSize * 0.25}
   
                 
 \begin{tikzpicture}
@@ -102,31 +105,31 @@
      %rectangle/\midRectangleHeight/\midRectangleHeight/MIDRECTANGLE/
     }}{}
    
-   \outline{o2}{}{above=0 cm of CENTERRECTANGLE.north east, anchor=center}{{
+   \outline{o2}{}{above=0.29 cm of CENTERRECTANGLE.north east, anchor=center}{{
      rectangle/\rightRectangleHeight/\rightRectangleWidth/RIGHTRECTANGLE/
    }}{}
    
-   \outline{o2}{}{above=0 cm of INNERRECTANGLE.north west, anchor=center}{{
+   \outline{o2}{}{above=0 cm of INNERRECTANGLE.140, anchor=center}{{
      circle/\leftCircle/\leftCircle/LEFTCIRCLE/
    }}{draw}
    
    
    \hardware{hw0}{\hwSize}{}
    
-   \containerEngine{ce}{\ceSize}{above = 0.6 cm of hw0_openshift.south, anchor=center}
+   \containerEngine{ce}{\ceSize}{above = 0.35 cm of hw0_openshift.south, anchor=south}
    \container{c0}{\coSize}{above = 0 cm of ce.center, anchor=center}
    \container{c1}{\coSize}{left= \coSepSize cm of c0.center}
    \container{c2}{\coSize}{right= \coSepSize cm of c0.center}
    \container{c3}{\coSize}{right= \coSepSize cm of c2.center}
    \container{c4}{\coSize}{left= \coSepSize cm of c1.center}
   
-   \node[above= 0cm of c0.north, text=white, anchor=south, inner sep=0mm ] () {Containers};
+   \node[above= 0.05cm of c0.north, text=white, anchor=south, inner sep=0mm ] () {\bfseries{Containers}};
    %\path[->, to path={-| (\tikztotarget)}]
    %  (C_LABEL_\id.west) edge (C0_\id.north)
    %  (C_LABEL_\id.east) edge (C7_\id.north);
    
-   \podd{p0}{\poSize}{above = 0 cm of CENTERRECTANGLE.north, anchor=center }{}
-   \node[text=white, above = 0cm of p0.north, anchor=south, inner sep =0 mm] {Pod};     
+   \podd{p0}{\poSize}{above = 0.3 cm of CENTERRECTANGLE.north, anchor=center }{}
+   \node[text=white, above = 0cm of p0.north, anchor=south, inner sep =0 mm] {\bfseries{Pod}};     
    \draw [line width=0.1 mm, dotted] 
      (p0_center.north) edge (LEFTCIRCLE.30)
      (p0_center.south) edge (LEFTCIRCLE.south)
@@ -144,8 +147,8 @@
    \elasticsearch{e0}{\poSize}{above = 0 cm of INNERRECTANGLE.348, anchor=center}{Elasticsearch pod}
    \zookeeper{z0}{\poSize}{above = 0 cm of INNERRECTANGLE.332, anchor=center}{Zookeeper pod}
    
-   \draw [text=white,] 
-     (p0.east) -- node[above] {could be} ++ (RIGHTRECTANGLE)
+   \draw [text=white] 
+     (p0.east) -- node[above] {\bfseries{could be}} ++ (RIGHTRECTANGLE)
    ;
    %line width=0.01 mm
    \draw [-, to path={|- (\tikztotarget)}] 

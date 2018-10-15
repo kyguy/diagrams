@@ -53,7 +53,7 @@
          #3] (\connectorId) {};
   
   \node[ rectangle,
-         inner sep =-01.1 mm,
+         inner sep =-1.1 mm,
          minimum size =\cubeSize cm,
          connectorColor,
          above = 0 cm of \connectorId.east,
@@ -87,6 +87,11 @@
   % SIZING
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \pgfmathsetmacro\diagramSize{1.0}
+  
+  \pgfmathsetmacro\fontSize{\diagramSize * 5}
+  \pgfmathsetmacro\fontSep{\diagramSize *  5}
+  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
+  
   \pgfmathsetmacro\hwSize{\diagramSize * .50}
   \pgfmathsetmacro\conSize{\diagramSize * .90}
   \pgfmathsetmacro\datumSize{\conSize * 0.15}
@@ -97,25 +102,22 @@
   \pgfmathsetmacro\coSize{\poSize * 0.27} % container
   \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
 
-  \pgfmathsetmacro\fontSize{\diagramSize * 3}
-  \pgfmathsetmacro\fontSep{\diagramSize *  2}
-  \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
-  
+
   \pgfmathsetmacro\nodeSize{1.0}
 
   % Circle Outlines
   \pgfmathsetmacro\outlineSize{4.5}
-  \pgfmathsetmacro\frameCircle{\outlineSize * 1.02}
+  \pgfmathsetmacro\frameCircle{\outlineSize * 1.10}
 
   
   % Rectangle Outlines
-  \pgfmathsetmacro\frameRectangleHeight{\outlineSize * 1.50}
-  \pgfmathsetmacro\frameRectangleWidth{\outlineSize  * 1.75}
+  \pgfmathsetmacro\frameRectangleHeight{\outlineSize * 1.55}
+  \pgfmathsetmacro\frameRectangleWidth{\outlineSize  * 2}
   
-  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.25}
-  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 1.35}
+  \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.30}
+  \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 1.65}
   
-  \pgfmathsetmacro\alignRectangleHeight{\outlineSize * 0.5}
+  \pgfmathsetmacro\alignRectangleHeight{\outlineSize * 0.40}
   \pgfmathsetmacro\alignRectangleWidth{\outlineSize * 2.0}
                 
 \begin{tikzpicture}
@@ -175,43 +177,44 @@
    } 
    }
 
-   \connector{con2}{0.7}{above = 0.3 cm of INNERRECTANGLE.230, anchor=south}{\fluentdStandalone}{ {} }
-   \node[above = 0cm of con2.south, anchor=north, outer sep = -0.5mm] () {Connector};
+   \connector{con2}{0.7}{above = 0.6 cm of INNERRECTANGLE.225, anchor=south}{\fluentdStandalone}{ {} }
+   \node[above = 0cm of con2.south, anchor=north, outer sep = -0.5mm] () {\bfseries{Connector}};
    
-  \node[align=center, below = 0.7cm of INNERRECTANGLE.100] (ct) {Connector Activation};
-  \node[ below = 0. cm of INNERRECTANGLE.125, anchor=north,
+  \node[align=center, below = 0.05cm of FRAMECIRCLE.105, anchor=center] (ct) {\bfseries{Connector Activation}};
+  \node[ below = 0. cm of INNERRECTANGLE.135, anchor=north,
           minimum height=0.1 cm,
           inner sep=0mm, 
-          label={[align=center]center:REST\\INTERFACE}
+          label={[align=center]center:\bfseries{REST}\\\bfseries{INTERFACE}}
         ] (API) {
     \begin{tikzpicture}
-      \fill[thick, gray, opacity=0.5] \gear{8}{0.6}{0.5}{10}{2}{0.3};
+      \fill[thick, gray, opacity=0.5] \gear{8}{0.8}{0.7}{10}{2}{0.3};
     \end{tikzpicture}}; 
 
    \draw [link,draw=gray!30, to path={-| (\tikztotarget)}]
    (API.east)  edge  (con0.north);
-   \draw [link,draw=gray!30, to path={|- (\tikztotarget)}]
-   (API.south)  edge  (con1.west)
+   %\draw [link,draw=gray!30, to path={|- (\tikztotarget)}]
+   %(API.south)  edge  (con1.west)
    ;
     
-   \node[align=center] (ct) at ($(con0)!0.5!(con1)$) {Connector\\Tasks};
+   \node[align=center] (ct) at ($(con0)!0.5!(con1)$) {\bfseries{Connector}\\\bfseries{Tasks}};
    \draw [->] (ct)  edge  (con0.south);
    \draw [->] (ct)  edge  (con1.north);
 
-  \node[left = 0.20 cm of FRAMECIRCLE.center](){\normalsize Worker};
-  \node[above = 0 cm of INNERRECTANGLE.south](){\normalsize Kafka Connect Node};
+  \node[left = 0.20 cm of FRAMECIRCLE.center](){\bfseries{\normalsize Worker}};
+  \node[above = 0 cm of INNERRECTANGLE.south](){\bfseries{\normalsize Kafka Connect Node}};
   
-  \node[align=center, above = 0 cm of ALIGNRECTANGLE.north] (ed_label) {External data};
+  \node[align=center, above = 0.55 cm of ALIGNRECTANGLE.100] (ed_label) {\bfseries{External data}};
   \draw [->, to path={|- (\tikztotarget)}]
     (ed_label)  edge  (par0_1)
-    (ed_label)  edge  (par2_1)
+    (ed_label)  edge  (par1_1)
+    (ed_label)  edge  (par2_0)
     ;
-  \draw [->] (ed_label)  edge  (par1_1);
+  %\draw [->] (ed_label)  edge  (par1_1);
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % DATA FLOW
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \node[above = 0cm of ALIGNRECTANGLE.161] () {External Data Flow};
+  \node[above = 0cm of ALIGNRECTANGLE.165] () {\bfseries{External Data Flow}};
   \tikzstyle{datum}=[rectangle, minimum size=\datumSize]
   \pgfmathsetmacro\llSize{\datumSize*2.5}
   \node[datum, fill=red!50, right = 0.2 cm of ALIGNRECTANGLE.west] (d0) {};
