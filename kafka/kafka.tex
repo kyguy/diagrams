@@ -32,7 +32,7 @@
   \pgfmathsetmacro\coSize{\poSize * 0.27} % container
   \pgfmathsetmacro\coSepSize{\coSize * 0.5} % container
 
-  \pgfmathsetmacro\fontSize{\diagramSize * 5}
+  \pgfmathsetmacro\fontSize{\diagramSize * 8}
   \pgfmathsetmacro\fontSep{\diagramSize *  3}
   \tikzset{font=\fontsize{\fontSize}{\fontSep}\selectfont}
   
@@ -49,7 +49,7 @@
   \pgfmathsetmacro\innerRectangleHeight{\outlineSize * 1.25}
   \pgfmathsetmacro\innerRectangleWidth{\outlineSize * 1.35}
   
-  \pgfmathsetmacro\alignRectangleHeight{\outlineSize * 0.75}
+  \pgfmathsetmacro\alignRectangleHeight{\outlineSize * 0.78}
   \pgfmathsetmacro\alignRectangleWidth{\outlineSize * 0.70}
                 
 \begin{tikzpicture}
@@ -79,22 +79,22 @@
    %\partition{p0}{\segmentSize}{}{3}{fill=purple!50}
    \tikzstyle{topicLeaderColor} = [fill=red!50]
    \tikzstyle{topicFollowerColor} = [fill=red!10]
-   \broker{b0}{\recordSize}{below = 0.1cm of ALIGNRECTANGLE.north west, anchor=north}{ 
+   \broker{b0}{\recordSize}{below = 0.5cm of ALIGNRECTANGLE.north west, anchor=north}{ 
        {  
          par0/5/topicLeaderColor/,
          par1/2/topicFollowerColor/,
          par2/4/topicFollowerColor/
      } }
      
-  \node[above = 0.15cm of ALIGNRECTANGLE.100, anchor=center] (partition_label) {\bfseries{partition}};
+  \node[above = 0.17cm of ALIGNRECTANGLE.100, anchor=center] (partition_label) {\bfseries{partition}};
   \draw [to path={-| (\tikztotarget)}]
-    (partition_label) edge (b0_par0_r1.120)
-    (partition_label) edge (b0_par0_r5)
+    (partition_label) edge (b0_par0_r1.north west)
+    (partition_label) edge (b0_par0_r5.north east)
   ;
-  \node[above = 0.05cm of b0_par0_r2, anchor=south, inner sep=0mm] (seg_label) {\bfseries{segment}};
+  \node[above = 0.05cm of b0_par0_r3, anchor=south, inner sep=0mm] (seg_label) {\bfseries{segment}};
   \draw [to path={-| (\tikztotarget)}]
-    (seg_label) edge (b0_par0_r1.north west)
-    (seg_label) edge (b0_par0_r3.north east)
+    (seg_label) edge (b0_par0_r2.north west)
+    (seg_label) edge (b0_par0_r4.north east)
   ;
   \tikzstyle{new_record}=[rectangle, draw=red!50, thick, dotted, minimum size=\recordSize cm]
   \node[new_record, right = 0cm of b0_par0_r5, anchor=west] (b0_par0_r6) {};
@@ -102,7 +102,7 @@
   \node[below = 0.2cm of b0_par0_r4, anchor=north] (rec_label) {\bfseries{record}};
   \draw [->] (rec_label) edge (b0_par0_r4);
   
-  \node[below = 0.4cm of b0_par0_r6.south, anchor=north] (new_rec_label) {\bfseries{new record}};
+  \node[below = 0.6cm of b0_par0_r6.south, anchor=north] (new_rec_label) {\bfseries{new record}};
   \draw [->] (new_rec_label) edge (b0_par0_r6);
   
   \node[above = 0cm of ALIGNRECTANGLE.south] () {\bfseries{\normalsize Kafka Broker}};
@@ -119,7 +119,7 @@
   label={[label distance=0cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont \bfseries{Follower}}}
   ] (l_follower) {};
   
-  \node[above left = 0.3cm and 0.2 cm of ALIGNRECTANGLE.west, anchor=east] (topic_label) {\bfseries{Topic}};
+  \node[above left = 0.0cm and 0.2 cm of ALIGNRECTANGLE.west, anchor=east] (topic_label) {\bfseries{Topic}};
   \draw [to path={|- (\tikztotarget)}]
     (topic_label) edge (b0_par0_r1)
     (topic_label) edge (b0_par2_r1)

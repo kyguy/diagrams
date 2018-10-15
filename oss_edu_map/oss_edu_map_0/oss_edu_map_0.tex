@@ -22,7 +22,7 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LOGGY
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \loggy{loggy}{0.9}{above right = 0.5 cm and 1.65cm of OUTERRECTANGLE.north west}{180}{Loggy}
+  \loggy{loggy}{0.9}{left = 0.5 cm of OUTERRECTANGLE.192}{180}{Loggy}
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % LOGGY ROUTE
@@ -33,7 +33,7 @@
   \tikzstyle{S_CONN}  = [SECURE_CONN, line width=\connThickness mm, color=red!60]
   
   \path[S_CONN]  
-  (lp0.south) edge (flu0)
+  %(lp0.south) edge (flu0)
   (flu0.east) edge (kcp0)
   (flu0.east) edge (kcp0)
   (kcp0) edge (kp2)
@@ -46,7 +46,7 @@
   % LABELS
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \node[above= 0cm of OUTERRECTANGLE.40, anchor=center] () {\textbf{\Large Map of Loggy's Journey}};
-  \node[above= 0.95cm of hw10_openshift.mid, anchor=south] () {\textbf{\Large START}};
+  \node[below= 1.75cm of hw8_openshift.mid, anchor=north] () {\textbf{\Large START}};
   \node[below= 1.75cm of hw9_openshift.mid, anchor=north] () {\textbf{\Large FINISH}};
  
 \end{tikzpicture}
