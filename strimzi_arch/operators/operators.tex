@@ -34,10 +34,10 @@
 
 \begin{tikzpicture}
   \pgfmathsetmacro\frameHeight{\diagramSize*3}
-  \pgfmathsetmacro\frameWidth{\diagramSize*4.5}
+  \pgfmathsetmacro\frameWidth{\diagramSize*4.8}
   
   \pgfmathsetmacro\crHeight{\diagramSize*5}
-  \pgfmathsetmacro\crWidth{\diagramSize*7.4}
+  \pgfmathsetmacro\crWidth{\diagramSize*8.4}
 
   \outline{o0}{}{}{
    {
@@ -53,6 +53,10 @@
   
   \kafkaPodResource{kr0}{\diagramSize}{above=0cm of FRAME.west, anchor=center}{}
 
+\iffalse
+\lstset{basicstyle=\rmfamily\bfseries}
+%\rmfamily
+%\footnotesize\bfseries
 \node[above=0cm of CR.center, anchor=center] {
 \begin{lstlisting}
 apiVersion: kafka.strimzi.io/v1alpha1
@@ -80,7 +84,7 @@ spec:
     userOperator: {}
 \end{lstlisting}
 };
-
+\fi
 \draw[-, dotted] 
   (kr0) edge (CR.north west)
   (kr0) edge (CR.south west)

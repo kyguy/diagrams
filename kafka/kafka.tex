@@ -86,16 +86,16 @@
          par2/4/topicFollowerColor/
      } }
      
-  \node[above = 0.17cm of ALIGNRECTANGLE.100, anchor=center] (partition_label) {\bfseries{partition}};
+  \node[above = 0.0cm of b0_par0_r3, anchor=center, anchor=south] (partition_label) {\bfseries{partition}};
   \draw [to path={-| (\tikztotarget)}]
     (partition_label) edge (b0_par0_r1.north west)
     (partition_label) edge (b0_par0_r5.north east)
   ;
-  \node[above = 0.05cm of b0_par0_r3, anchor=south, inner sep=0mm] (seg_label) {\bfseries{segment}};
-  \draw [to path={-| (\tikztotarget)}]
-    (seg_label) edge (b0_par0_r2.north west)
-    (seg_label) edge (b0_par0_r4.north east)
-  ;
+  %\node[above = 0.05cm of b0_par0_r3, anchor=south, inner sep=0mm] (seg_label) {\bfseries{segment}};
+  %\draw [to path={-| (\tikztotarget)}]
+  %  (seg_label) edge (b0_par0_r2.north west)
+  %  (seg_label) edge (b0_par0_r4.north east)
+  %;
   \tikzstyle{new_record}=[rectangle, draw=red!50, thick, dotted, minimum size=\recordSize cm]
   \node[new_record, right = 0cm of b0_par0_r5, anchor=west] (b0_par0_r6) {};
   

@@ -254,7 +254,7 @@
            fill=kafkaConnectPod!\colorIntensity,
            draw=white,
            fit=(\kafkaConnectPodId_0),
-           label={[label distance=\kcPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+           label={[name=\kafkaConnectPodId l,label distance=\kcPodLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
          ] (\kafkaConnectPodId) {};
   \end{pgfonlayer}
 }
@@ -555,7 +555,7 @@
   }
    
   % Make List Here (Aggregate nodes for Legend )
-  \node[dotted, thick, fit=(toL)(kpL)(zL)] () {};
+  %\node[dotted, thick, fit=(toL)(kpL)(zL)] () {};
 }
 
 \newcommand{\cluster}[6] { %{Id}{Size}{Location}{Num}{Type}{Extra}
@@ -622,7 +622,7 @@
          fluentdLocation,
          inner sep = 0 mm,
          minimum size=\fluentdSize cm,
-         fill=FluentdColor!40, %\colorIntensity,
+         fill= FluentdColor!20, %\colorIntensity,
          draw=white,
          label={[label distance=\fluentdLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\fluentdId) {};
@@ -655,9 +655,9 @@
          elasticsearchLocation,
          inner sep = 0 mm,
          minimum size=\elasticsearchSize cm, 
-         fill=ElasticsearchColor!40, %\colorIntensity,
+         fill=ElasticsearchColor!70, %\colorIntensity,
          draw=white,
-         label={[label distance=\esLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
+         label={[name=\elasticsearchId l, label distance=\esLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\elasticsearchId) {};
        
   \node[ above = 0 cm of \elasticsearchId.center, anchor=center 
@@ -691,7 +691,7 @@
          strimziLocation,
          inner sep = 0 mm,
          minimum size=\strimziSize cm, 
-         fill=StrimziColor!30, %\colorIntensity,
+         fill= ClusterOperatorColor!50, %StrimziColor!30, %\colorIntensity,
          draw=white,
          label={[label distance=\strimziLabelDist cm]0:{\fontsize{\fontSize pt}{\fontSep pt}\selectfont #4}}
        ] (\strimziId) {};
@@ -740,14 +740,14 @@
   \initVars{loggy}{#1}{#2}{#3}
   \pgfmathsetmacro\loggySize{#2/2}
   \pgfmathsetmacro\loggySiz{#2 * 0.10}
-  \tikzstyle{loggyColor}=[fill=blue!10]
+  \tikzstyle{loggyColor}=[fill=blue!30]
   \pgfmathsetmacro\loggyCoreSize{\loggySize * 0.90}
   \pgfmathsetmacro\loggyCornerSize{\loggySize * 0.25}
   
   \tikzstyle{all}=[line width=0.0 mm]
   \tikzstyle{body}= [all, rectangle, draw=blue!10, loggyColor, minimum size=#2 cm, rounded corners=\loggyCornerSize cm, inner sep=0mm]
   \tikzstyle{parts}=[all, fill=white, draw=black, inner sep=0mm, minimum size = \loggySiz cm]
-  \tikzstyle{eye}=[ parts,circle]
+  \tikzstyle{eye}=[ parts,circle, thick]
   
   \node[#3] (\loggyId) {};
   \node[body, below=0cm of \loggyId.center, anchor=center] (\loggyId body) {};
@@ -762,6 +762,7 @@
        
   \node[ parts,
          semicircle,
+         thick,
          minimum size = \loggySiz cm,
          inner sep=0mm,
          rotate=#4,

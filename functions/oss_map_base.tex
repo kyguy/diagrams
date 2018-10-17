@@ -169,4 +169,20 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \node[above= 0cm of OUTERRECTANGLE.40, anchor=center] () {\textbf{\Large Map of Loggy's Journey}};
   \node[above = 1.4 of hw8.south west] () { \bfseries{(1..N)} };
+  
+  
+   \def\legendList{ \strimzi/coL/Strimzi pod, 
+                   \kafkaPod/kpL/Kafka Broker,
+                   \fluentd/ffL/Aggregator,
+                   \kafkaConnectPod/kcpL/Kafka Connect,
+                   \loggingPod/lpL/Loggy App,
+                   \elasticsearch/eL/Elasticsearch
+                 } 
+  
+  \legend{L0}{1.0}{above = 1cm of INNERRECTANGLE.320, anchor=center}{5}{\legendList}
+  
+  \node[dotted, draw, thick, fit=(coL)(kcpLl)(eL)] (legend) {};
+  \node[above = 0.1cm of legend.149] () {\bfseries{Legend}};
+  
+  
 }
