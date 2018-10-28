@@ -1,0 +1,36 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILE: oss_edu_map_2.tex
+% DESC: 
+%
+% TODO:
+%   - Refactor 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[ tikz,
+                border=5mm,
+               ]{standalone}
+\usepackage{import}
+\usepackage{standalone}
+\graphicspath{{../../images/}}
+
+\import{../../functions/}{oss_map_base}
+ 
+\begin{document}
+%\tikzstyle{blkTail} = [rectangle, fill=red!15]
+%\tikzstyle{blkMid}  = [rectangle, fill=red!30]
+\tikzstyle{blkHead} = [rectangle, fill=red!60]
+
+\foreach \num in {10,20,...,100}
+%\foreach \num in {10}
+{
+  \begin{tikzpicture}
+    \ossMap{}
+    \loggy{loggy}{0.9}{below left = 0.7cm and 1.4cm of kcp0, anchor=center}{180}{Loggy}
+    
+    \pgfmathsetmacro\headpercentage{\num / 100}
+    \node[blkHead] at ($ (flu0.east) !\headpercentage! (kcp0.west) $) () {};
+  \end{tikzpicture}
+}
+
+
+
+\end{document}

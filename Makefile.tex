@@ -2,5 +2,5 @@ all: generate
 
 generate:
 	pdflatex -shell-escape $(PROJECT_NAME).tex
-	convert -strip -density 1000 $(PROJECT_NAME).pdf -quality 100 $(PROJECT_NAME).png
-	-rm ./*{aux,fdb_latexmk,fls,log,synctex.gz,~} 2> /dev/null
+	#convert -strip -density 1000 $(PROJECT_NAME).pdf -quality 100 $(PROJECT_NAME).png
+	-rm ./*{aux,fdb_latexmk,fls,log,synctex.gz,~,png} 2> /dev/null
